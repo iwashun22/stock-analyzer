@@ -1,0 +1,35 @@
+version: '3'
+services:
+  frontend:
+    build:
+      context: ./frontend
+    platform: linux/amd64
+    tty: true # docker run -t
+    stdin_open: true # docker run -i
+    ports:
+      - "8000:8000"
+    environment:
+      - BACK_END_URL=http://backend:8001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+  backend:
+    build:
+      context: ./backend
+    platform: linux/amd64
+    tty: true
+    stdin_open: true
+    ports:
+      - "8001:8001"
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_RUN_PORT=8001
+    volumes:
+      - ./backend:/app
+      - ./backend/ta-lib/lib/libta_lib.so:/usr/lib/libta_lib.so
+      - ./backend/ta-lib/lib/libta_lib.so.0:/usr/lib/libta_lib.so.0
+      - ./backend/ta-lib/lib/libta_lib.so.0.0.0:/usr/lib/libta_lib.so.0.0.0
+      - ./backend/ta-lib/include:/usr/include/ta-lib
+    command: sh -c "pip3 install -r requirements.txt && python3 run.py"
