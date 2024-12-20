@@ -29,5 +29,13 @@ plt.plot(dt_date, data['SMA200'], label='SMA200')
 plt.title(f"{symbol} Simple Moving Average")
 plt.xlabel('Date')
 plt.ylabel('Price')
-plt.savefig(f"{symbol}.png")
+# plt.savefig(f"{symbol}.png")
 plt.close()
+
+news = nflx.get_news()
+print(news)
+
+def foo(a, b, *x):
+  print(x)
+
+foo(1, 2, 3, 4, 5)
