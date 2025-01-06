@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
-from .utils.helpers import get_info, is_positive_int
-from .utils.graph import generate_img_url
-import talib
+from .utils.helpers import get_info, get_property
+from .utils.graph import generate_img
 
 api_blueprint = Blueprint('api', __name__)
 
@@ -20,35 +19,15 @@ def real_time_api(symbol):
 
   return jsonify(response)
 
-graph_params = ["first", "second", "third"]
-# format url /graph?symbol=<s>&analyzer=<a>&first=<1>...
+# format url /graph?symbol=<s>&period=<p>&indicator=<i>...
 @api_blueprint.route('/graph')
 def sma_graph():
-  symbol = request.args.get("symbol", "").upper()
-  analyzer = request.args.get("analyzer", "").upper()
+  symbol = get_property(request.args, "symbol").upper()
+  period = get_property(request.args, "period", "1y")
 
-  lengths = []
-  iter_check = 0
-  for i, param in enumerate(graph_params):
-    if param in request.args:
-      length = request.args.get(param)
-      if length and is_positive_int(length):
-        if not iter_check == i:
-          return "Bad request", 400
-        lengths.append(int(length))
-        iter_check += 1
-      elif length:
-        return "Bad request", 400
+  data, error_message = generate_img(symbol, request.args, period)
 
-  if len(lengths) == 0 or not analyzer:
-    return "Bad request", 400
+  if not data:
+    return error_message, 400
 
-  if analyzer == "SMA":
-    data_url = generate_img_url(symbol, talib.SMA, analyzer, timeperiods=lengths)
-  else:
-    return "Bad request", 400
-
-  if not data_url:
-    return "Bad request", 400
-
-  return jsonify({ "imageUrl": data_url })
+  return jsonify(data)
