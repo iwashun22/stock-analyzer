@@ -67,10 +67,12 @@ def get_info(symbol):
   symbol = symbol.upper()
   try:
     ticker = yf.Ticker(symbol)
-    if ticker.info:
-      return dict(ticker.info)
-    else:
+    info = ticker.info
+    if not info or ('longName' not in info) or (info.get('marketCap') is None):
+      print(info)
       return None
+    else:
+      return dict(ticker.info)
 
   except Exception as e:
     return None

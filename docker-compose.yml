@@ -9,10 +9,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - BACK_END_URL=http://backend:8001
+      - VITE_API_URL=http://backend:8001
     volumes:
       - ./frontend:/app
-      - /app/node_modules
     depends_on:
       - backend
   backend:

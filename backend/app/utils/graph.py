@@ -7,6 +7,7 @@ from .handle_indicators import *
 
 TREND_INDICATORS = ('SMA', 'EMA', 'ADX')
 MOMENTUM_INDICATORS = ('RSI', 'MACD')
+VOLATILITY_INDICATORS = ('BBANDS', 'ATR')
 
 def generate_img(symbol, request_args, past = "1y"):
   ticker = yf.Ticker(symbol)
@@ -36,24 +37,27 @@ def generate_img(symbol, request_args, past = "1y"):
   indicator = get_property(request_args, "indicator").upper()
   success, error_message, fig = None, None, None
   if indicator in TREND_INDICATORS:
-    fig, ax, draw = _draw_graph(
+    if indicator == 'SMA' or indicator == 'EMA':
+      fig, ax, draw = _draw_graph(
         data,
         close_prices=data['Close'],
-        suptitle=indicator,
-        ylabel="Price", 
-        xlabel="Date"
+        suptitle=indicator
       )
-    if indicator == 'SMA':
-      success, error_message = handle_sma(request_args, data, draw)
-    elif indicator == 'EMA':
-      success, error_message = handle_ema(request_args, data, draw)
+      success, error_message = handle_sma(request_args, data, draw, ax)
+    elif indicator == 'ADX':
+      fig, ax, draw = _draw_graph(
+        data,
+        suptitle=indicator,
+        grid=False,
+        ylabel="Value"
+      )
+      success, error_message = handle_adx(request_args, data, draw, ax)
   elif indicator in MOMENTUM_INDICATORS:
     if indicator == 'MACD':
       fig, ax, draw = _draw_graph(
           data,
           suptitle=indicator,
           ylabel="Value",
-          xlabel="Date",
           grid=False
         )
       success, error_message = handle_macd(request_args, data, draw, ax)
@@ -63,9 +67,24 @@ def generate_img(symbol, request_args, past = "1y"):
         ylimit=(0, 100),
         suptitle=indicator,
         ylabel="Value",
-        xlabel="Date"
+        grid=False
       )
-      success, error_message = handle_rsi(request_args, data, draw)
+      success, error_message = handle_rsi(request_args, data, draw, ax)
+  elif indicator in VOLATILITY_INDICATORS:
+    if indicator == 'BBANDS':
+      fig, ax, draw = _draw_graph(
+        data,
+        close_prices=data['Close'],
+        suptitle=indicator
+      )
+      success, error_message = handle_bbands(request_args, data, draw, ax)
+    elif indicator == 'ATR':
+      fig, ax, draw = _draw_graph(
+        data,
+        suptitle=indicator,
+        ylabel="Volatility"
+      )
+      success, error_message = handle_atr(request_args, data, draw, ax)
   elif indicator:
       success, error_message = False, f"The technical indicator {indicator} is not available."
   else:
@@ -74,7 +93,12 @@ def generate_img(symbol, request_args, past = "1y"):
   if not success and success is not None:
     return None, error_message
 
-  ax.legend(loc='upper left', bbox_to_anchor=(1.05, 1), borderaxespad=0.)
+  ax.legend(
+    loc='upper left',
+    prop={'family': 'monospace', 'size': 10},
+    bbox_to_anchor=(1.05, 1),
+    borderaxespad=0.
+  )
   plt.tight_layout()
   fig.autofmt_xdate()
 
@@ -98,25 +122,23 @@ def generate_img(symbol, request_args, past = "1y"):
 
 def _draw_graph(
   data,
-  close_prices=None, 
+  close_prices=None,
   grid=True,
   ylimit=None,
   suptitle=None,
-  ylabel=None,
-  xlabel=None
+  ylabel="Price",
+  xlabel="Date"
 ):
   data_length = len(data)
 
-  fig_width = max(10, data_length / 80)
+  fig_width = max(10, (data_length / 40))
   fig, ax = plt.subplots(figsize=(fig_width, 6))
   ax.grid(grid)
 
   fig.suptitle(f"Indicator: {suptitle}" if suptitle else "Technical Indicator", fontsize='x-large')
   
-  if ylabel:
-    ax.set_ylabel(ylabel, fontsize='large', fontfamily='monospace')
-  if xlabel:
-    ax.set_xlabel(xlabel, fontsize='large', fontfamily='monospace')
+  ax.set_ylabel(ylabel, fontsize='large', fontfamily='monospace')
+  ax.set_xlabel(xlabel, fontsize='large', fontfamily='monospace')
 
   try:
     if not close_prices.empty:
@@ -132,11 +154,9 @@ def _draw_graph(
       ax.plot(data.index, plot, *args, **kwargs)
     elif pltype == "bar":
       ax.bar(data.index, plot, *args, **kwargs)
-    elif pltype == "scatter":
-      ax.scatter(*args, **kwargs)
 
     if include_nan:
       nan_indices = np.where(np.isnan(plot))
-      ax.plot(data.index[nan_indices], [0] * len(nan_indices[0]), color='red', dashes=[6, 2])
+      ax.plot(data.index[nan_indices], [0] * len(nan_indices[0]), color='gray', dashes=[6, 2])
 
   return fig, ax, draw

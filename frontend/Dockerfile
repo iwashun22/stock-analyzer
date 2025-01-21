@@ -1,4 +1,4 @@
-FROM node:18.17.1-slim
+FROM node:23.6-slim
 
 RUN apt-get update \ 
     && apt-get install -y locales tmux curl \
@@ -16,3 +16,4 @@ ENV LANG=en_US.UTF-8
 ENV TZ=Asia/Bangkok
 
 WORKDIR /app
+EXPOSE 8000
