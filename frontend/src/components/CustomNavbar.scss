@@ -1,0 +1,18 @@
+.navbar {
+  background-color: black;
+}
+
+.nav-item {
+  padding: 0 14px;
+  box-sizing: content-box;
+
+  $hovered-color: rgb(193, 132, 63);
+  &:hover {
+    color: $hovered-color;
+    border-bottom: 3px $hovered-color solid;
+
+    * {
+      color: $hovered-color !important;
+    }
+  }
+}

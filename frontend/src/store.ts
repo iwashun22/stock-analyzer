@@ -1,13 +1,19 @@
 import { configureStore } from '@reduxjs/toolkit';
-import targetReducer from './features/targetSlice';
-import graphReducer from './features/graphSlice';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import rootReducer from './features/reducers';
+
+const persistConfig = {
+  key: 'stock-analyzer',
+  storage
+}
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: {
-    target: targetReducer,
-    indicators: graphReducer,
-  }
+  reducer: persistedReducer,
 })
+export const persistore = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

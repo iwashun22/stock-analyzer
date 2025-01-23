@@ -3,7 +3,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 export interface graph {
   indicator: string,
-  id: number,
+  id: string,
   params: object
 }
 export interface graphState {
@@ -14,8 +14,8 @@ const initialState: graphState = {
   list: []
 }
 
-function generateId(): number {
-  return Math.round(Math.random() * Date.now());
+function generateId(): string {
+  return Math.random().toString(16).split('.')[1].substring(0, 8);
 }
 export const graphSlice = createSlice({
   name: 'indicators',

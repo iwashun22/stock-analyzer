@@ -5,19 +5,17 @@ export interface targetState {
   symbol: string,
   period: string,
   isValidSymbol: boolean,
-  storageName: 'stock_analyzer_target_symbol'
 }
 
-const initialState: targetState = {
+export const INITIAL_STATE: targetState = {
   symbol: '',
   period: '1y',
-  isValidSymbol: false,
-  storageName: 'stock_analyzer_target_symbol'
-}
+  isValidSymbol: false
+};
 
 export const targetSlice = createSlice({
   name: 'target',
-  initialState,
+  initialState: INITIAL_STATE,
   reducers: {
     updateSymbol: (state, action: PayloadAction<string>) => {
       state.symbol = action.payload;
