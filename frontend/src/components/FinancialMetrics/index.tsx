@@ -1,33 +1,29 @@
 import { useEffect, useState } from 'react';
 import type { RootState } from '../../store';
-import { updateValidity } from '../../features/targetSlice';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
+import ValuationMetrics from './ValuationMetrics';
+import './index.scss';
 
 function FinancialMetrics() {
-  const target = useSelector((state: RootState) => state.target);
-  const dispatch = useDispatch();
+  const symbol = useSelector((state: RootState) => state.target.symbol);
   const [info, setInfo] = useState<Record<string, any>>({});
   useEffect(() => {
-    axios.get(`/api/info/${target.symbol}`)
+    axios.get(`/api/info/${symbol}`)
       .then(response => {
         setInfo(response.data);
-        dispatch(updateValidity(true));
       })
       .catch(error => {
         console.error(error);
-        dispatch(updateValidity(false));
       })
   }, [])
   return (
-    <>
+    <div className="text-light">
       <div>FinancialMetrics</div>
-      {
-        Array.from(Object.keys(info))
-          .filter(v => !(info[v] instanceof Object))
-          .map((v, i) => <p key={i}>{info[v]}</p>)
-      }
-    </>
+      <div className="table-container">
+        <ValuationMetrics info={info}/>
+      </div>
+    </div>
   )
 }
 

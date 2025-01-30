@@ -39,7 +39,7 @@ def resolve_path(filename):
   return None
   
 def parse_time_period(input_str):
-  matched = re.fullmatch(r"^(\d+)([dwmy])$", input_str, re.IGNORECASE)
+  matched = re.fullmatch(r"^(\d+)([wmy])$", input_str, re.IGNORECASE)
   if matched:
     number = int(matched.group(1))
     unit = matched.group(2).lower()

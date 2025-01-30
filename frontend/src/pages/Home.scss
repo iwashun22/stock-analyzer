@@ -22,7 +22,6 @@
   }
 
   .header {
-    margin-top: 1rem;
     .header-title {
       text-transform: uppercase;
       color: #eee;
@@ -36,14 +35,78 @@
 
   .input-field {
     margin-top: 1rem;
-    min-height: 150px;
 
-    .symbol-input {
-      background-color: rgba(0, 0, 0, 0.3);
-      color: white;
-      width: 300px;
-      &::placeholder {
-        color: #bbb;
+    .form-wrapper {
+      display: flex;
+      flex-direction: row;
+
+      .input-submit {
+        margin-left: 24px;
+
+        .submit-btn {
+          $btn-primary-color: rgb(218, 59, 86);
+          $btn-primary-hovered-color: rgb(192, 53, 76);
+          background-color: $btn-primary-color;
+          border-color: $btn-primary-color;
+          color: white;
+          font-weight: bolder;
+
+          &:hover {
+            background-color: $btn-primary-hovered-color;
+            border-color: $btn-primary-hovered-color;
+          }
+        }
+      }
+    }
+    .symbol-input-wrapper {
+      min-height: 100px;
+
+      .symbol-input {
+        background-color: rgba(0, 0, 0, 0.3);
+        color: white;
+        width: 300px;
+        &::placeholder {
+          color: #bbb;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 586px) {
+  .main-wrapper {
+    .header {
+      margin: 0;
+      .header-title {
+        font-size: 2rem;
+        text-shadow: 2px 2px 0px red,
+                    -2px -2px 0px cyan;
+      }
+    }
+
+    .input-field {
+      margin: 0;
+
+      .form-wrapper {
+        flex-direction: column;
+
+        .symbol-input-wrapper {
+          display: flex;
+          flex-direction: column-reverse;
+          align-items: flex-end;
+          margin-bottom: 15px;
+
+          .symbol-input {
+            margin-top: 10px;
+          }
+        }
+        .input-submit {
+          margin: 0;
+
+          .submit-btn {
+            width: 100%;
+          }
+        }
       }
     }
   }

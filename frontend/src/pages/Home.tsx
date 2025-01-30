@@ -5,7 +5,6 @@ import { updateValidity, updateSymbol } from '@/features/targetSlice';
 import { useNavigate } from 'react-router';
 import CustomNavbar from '@/components/CustomNavbar';
 import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
@@ -45,7 +44,6 @@ function Home() {
       e.stopPropagation();
     }
     else {
-      console.log(symbol);
       dispatch(updateSymbol(symbol));
       dispatch(updateValidity(true));
       navigate('/analyzer');
@@ -95,12 +93,11 @@ function Home() {
       </div>
       <div className="input-field">
         <Form 
-          // style={{ display: 'flex', flexDirection: 'row' }}
           onSubmit={checkEmpty}
           noValidate
-          >
-          <Row>
-            <Form.Group as={Col}>
+        >
+          <div className="form-wrapper">
+            <Form.Group as={Col} className="symbol-input-wrapper">
               <Form.Control 
                 type="text"
                 className="symbol-input"
@@ -124,12 +121,16 @@ function Home() {
                 </Form.Control.Feedback>
               }
             </Form.Group>
-            <Form.Group as={Col}>
-              <Button type="submit" variant="outline-light" className="px-4">
+            <Form.Group as={Col} className="input-submit">
+              <Button 
+                type="submit"
+                // variant="outline-light"
+                className="px-4 submit-btn"
+              >
                 LOOK UP
               </Button>
             </Form.Group>
-          </Row>
+          </div>
         </Form>
       </div>
     </div>

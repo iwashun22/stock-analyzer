@@ -54,7 +54,7 @@ def indicators():
 
 # format url /graph?symbol=<s>&period=<p>&indicator=<i>...
 @api_blueprint.route('/graph')
-def sma_graph():
+def generate_graph():
   symbol = get_property(request.args, "symbol").upper()
   period = get_property(request.args, "period", "1y")
 
@@ -64,3 +64,13 @@ def sma_graph():
     return error_message, 400
 
   return jsonify(data)
+
+@api_blueprint.route('/check/period/<string:period>')
+def check_period_validity(period):
+  checked = parse_time_period(period)
+
+  if not checked:
+    return "Validity check failed", 400
+  
+  number, unit = checked
+  return jsonify({ "number": number, "unit": unit })
