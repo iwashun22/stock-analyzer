@@ -17,15 +17,15 @@ function ValuationMetrics({ info }: {
       <thead>
         <tr>
           {
-            keys.current.map(key => <th>{key.represent}</th>)
+            keys.current.map((key, i) => <th key={i}>{key.represent}</th>)
           }
         </tr>
       </thead>
       <tbody>
         <tr>
           {
-            keys.current.map(({ keyName }) => 
-              <td>{ info[keyName] ? info[keyName] : "-" }</td>
+            keys.current.map(({ keyName }, i) => 
+              <td key={i}>{ info[keyName] ? info[keyName] : "-" }</td>
             )
           }
         </tr>

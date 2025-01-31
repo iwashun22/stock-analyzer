@@ -5,6 +5,7 @@ import { updateValidity } from '@/features/targetSlice';
 import type { RootState } from '@/store';
 import TargetEditor from '@/components/TargetEditor';
 import FinancialMetrics from '@/components/FinancialMetrics';
+import TechnicalIndicators from '@/components/TechnicalIndicators';
 
 function Analyzer() {
   const dispatch = useDispatch();
@@ -30,6 +31,7 @@ function Analyzer() {
     <>
       <TargetEditor/>
       <FinancialMetrics/>
+      <TechnicalIndicators/>
     </>
   )
 }

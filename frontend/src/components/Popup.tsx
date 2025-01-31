@@ -1,5 +1,6 @@
 import React from 'react';
 import { IoMdClose } from 'react-icons/io';
+import type { IconType } from 'react-icons';
 import './Popup.scss';
 
 type Variant = "default" | "error";
@@ -8,12 +9,14 @@ type ModalProps = React.PropsWithChildren<
     show: boolean,
     noCloseButton?: false,
     onClose: (e: React.MouseEvent) => unknown,
-    variant?: Variant
+    variant?: Variant,
+    CustomButton?: null | IconType,
   } | {
     show: boolean,
     noCloseButton?: true,
     onClose?: never,
-    variant?: Variant
+    variant?: Variant,
+    CustomButton?: null,
   }
 >;
 
@@ -22,6 +25,7 @@ function Popup({
   onClose,
   variant = 'default',
   noCloseButton = false,
+  CustomButton = null,
   children,
 }: ModalProps) {
   if (show) {
@@ -35,7 +39,12 @@ function Popup({
                   className="bg-transparent close-btn"
                   onClick={onClose}
                 >
-                  <IoMdClose size={20} className="d-block close-icon"/>
+                  {
+                    CustomButton !== null ?
+                    <CustomButton size={20} className="d-block close-icon"/>
+                    :
+                    <IoMdClose size={20} className="d-block close-icon"/>
+                  }
                 </button>
               </div>
             )
