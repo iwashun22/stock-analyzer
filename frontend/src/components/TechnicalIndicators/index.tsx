@@ -4,6 +4,7 @@ import { FaRegPlusSquare } from 'react-icons/fa';
 import { IoMdArrowBack } from 'react-icons/io';
 import axios from 'axios';
 import IndicatorForm from './IndicatorForm';
+import ShowGraph from './ShowGraph';
 import './index.scss';
 
 const separator = "::";
@@ -38,6 +39,7 @@ function TechnicalIndicators() {
 
   return (
     <>
+      <ShowGraph/>
       <Popup show={!!error} onClose={() => setError('')} variant='error'>
         <h5 className="text-center">{error}</h5>
       </Popup>

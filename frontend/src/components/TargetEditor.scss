@@ -5,7 +5,10 @@ $label-font-size: 20px;
 $symbol-font-size: 26px;
 
 .target-wrapper {
-  margin-top: 15px;
+  padding: 15px 0 20px;
+  background-color: rgb(48, 48, 48);
+  position: relative;
+  z-index: 1;
 
   .symbol-wrapper {
     cursor: pointer;
@@ -16,6 +19,8 @@ $symbol-font-size: 26px;
     justify-content: center;
     align-items: center;
     margin: 0 auto;
+    position: relative;
+    z-index: 100;
 
     & span {
       border: $border-size $bg-color solid;

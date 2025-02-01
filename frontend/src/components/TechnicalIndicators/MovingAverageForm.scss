@@ -21,21 +21,10 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
+  flex-wrap: wrap;
 
-  label {
-    $color: rgb(101, 101, 101);
-    width: 40%;
-    max-width: 100px;
-    margin: 0 8px 0 0 !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px $color solid;
-    color: $color;
-    border-radius: 6px;
-  }
   .form-input {
     width: 60%;
-    max-width: 400px;
+    max-width: 250px;
   }
 }

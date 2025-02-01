@@ -49,10 +49,17 @@ function TargetEditor() {
   }, []);
 
   return (
-    <div className="target-wrapper text-light">
+    <>
+      <Popup show={showPeriodEditor} onClose={() => setShowPeriodEditor(false)}>
+          <PeriodConfigForm
+            savedPeriod={savedPeriod}
+            closePopup={() => setShowPeriodEditor(false)}
+          />
+      </Popup>
       <Popup variant='error' show={!!error} onClose={() => setError('')}>
         <h5 className="text-center">{error}</h5>
       </Popup>
+    <div className="target-wrapper text-light">
       <div className="symbol-wrapper" onClick={confirmClick}>
         <span className="text-lowercase">symbol</span>
         <span className="text-uppercase">{target.symbol}</span>
@@ -71,13 +78,8 @@ function TargetEditor() {
           </button>
         </span>
       </div>
-      <Popup show={showPeriodEditor} onClose={() => setShowPeriodEditor(false)}>
-          <PeriodConfigForm
-            savedPeriod={savedPeriod}
-            closePopup={() => setShowPeriodEditor(false)}
-          />
-      </Popup>
     </div>
+    </>
   )
 }
 

@@ -1,0 +1,18 @@
+.graph-image-wrapper {
+  display: inline-block;
+  max-width: 90vw;
+  height: 80vh;
+  max-height: 700px;
+  overflow-x: scroll;
+
+  img {
+    height: 100%;
+    width: auto;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .graph-image-wrapper {
+    height: 70vw;
+  }
+}

@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #131313;
+  background-color: #1e1e1e;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -31,8 +31,14 @@ a:hover {
 body, html {
   margin: 0;
   max-width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+#root {
+  height: 100vh;
+  overflow: scroll;
 }
 
 h1 {

@@ -11,7 +11,7 @@ export interface graphState {
 }
 
 const initialState: graphState = {
-  list: []
+  list: [{ indicator: 'SMA', id: generateId(), params: { ranges: '12' }}]
 }
 
 function generateId(): string {
