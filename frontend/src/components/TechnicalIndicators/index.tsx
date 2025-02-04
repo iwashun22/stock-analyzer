@@ -3,6 +3,8 @@ import Popup from '../Popup';
 import { FaRegPlusSquare } from 'react-icons/fa';
 import { IoMdArrowBack } from 'react-icons/io';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/store';
 import IndicatorForm from './IndicatorForm';
 import ShowGraph from './ShowGraph';
 import './index.scss';
@@ -16,11 +18,20 @@ function TechnicalIndicators() {
   const [indicators, setIndicators] = useState<{[key: string]: unknown}>({});
   const [error, setError] = useState<string>('');
   const [selectedIndicator, setSelectedIndicator] = useState('');
+  const graph = useSelector((state: RootState) => state.graph);
+  const [indicatorMap, setIndicatorMap] = useState<Map<string, string>>(new Map());
 
   useEffect(() => {
     axios.get('/api/indicators')
       .then(response => {
         setIndicators(response.data);
+        const mapArr = [];
+        Object.entries(response.data).forEach(([key, value]) => {
+          Object.entries(value as object).forEach((indicatorSet) => {
+            mapArr.push(indicatorSet);
+          })
+        })
+        setIndicatorMap(new Map(mapArr));
       })
       .catch(err => {
         setError(err.toString());
@@ -37,9 +48,17 @@ function TechnicalIndicators() {
     }
   }, [selectedIndicator]);
 
+  // close form when updated
+  useEffect(() => {
+    if (showForm) {
+      setSelectedIndicator('');
+      setShowForm(false);
+    }
+  }, [graph])
+
   return (
     <>
-      <ShowGraph/>
+      <ShowGraph indicatorMap={indicatorMap}/>
       <Popup show={!!error} onClose={() => setError('')} variant='error'>
         <h5 className="text-center">{error}</h5>
       </Popup>
@@ -71,10 +90,7 @@ function TechnicalIndicators() {
             ))
           : <IndicatorForm indicator={split(selectedIndicator)}/>
         }
-      </Popup> 
-      <div className="graph-container">
-
-      </div>
+      </Popup>
     </>
   )
 }

@@ -1,13 +1,67 @@
+.config-container {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .indicator-name {
+    margin-right: 2rem;
+    margin-bottom: 0 !important;
+  }
+
+  .edit-btn, .delete-btn {
+    background-color: transparent;
+    padding: 10px 10px;
+    border: none;
+
+    .icon {
+      display: block;
+    }
+  }
+
+  .edit-btn .icon {
+    color: rgb(54, 96, 164);
+
+    &:hover {
+      color: rgb(28, 64, 122);
+    }
+  }
+  .delete-btn .icon {
+    color: red;
+
+    &:hover {
+      color: rgb(152, 0, 0);
+    }
+  }
+}
+
 .graph-image-wrapper {
   display: inline-block;
   max-width: 90vw;
   height: 80vh;
   max-height: 700px;
   overflow-x: scroll;
+  border-radius: 20px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   img {
     height: 100%;
     width: auto;
+  }
+}
+
+.loader-container {
+  display: flex;
+  height: 300px;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+
+  * {
+    color: white;
   }
 }
 

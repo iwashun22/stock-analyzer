@@ -1,17 +1,23 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { LuCircleMinus, LuCirclePlus } from 'react-icons/lu';
+import { useDispatch } from 'react-redux';
+import { addGraph, modifyGraph } from '@/features/graphSlice';
 import './MovingAverageForm.scss';
 
-function MovingAverageForm({ indicatorName, abbrev, maxRangesCount }: {
+function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParams, id, afterSubmit }: {
   indicatorName: string,
   abbrev: string,
-  maxRangesCount: number
+  maxRangesCount: number,
+  defaultParams?: { [key: string]: any },
+  id: string,
+  afterSubmit: () => unknown
 }) {
-  const [countRanges, setCountRanges] = useState<Array<string>>(['12']);
+  const [countRanges, setCountRanges] = useState<Array<string>>(defaultParams?.ranges?.split(';') || ['12']);
   const [invalidIndex, setInvalidIndex] = useState(-1);
   const [invalidFeedback, setInvalidFeedback] = useState('');
+  const dispatch = useDispatch();
 
   const handleOnChange = useCallback((index: number) => {
     return (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,19 +60,35 @@ function MovingAverageForm({ indicatorName, abbrev, maxRangesCount }: {
     }
 
     const uniqueMap = new Map<string, boolean>();
-    countRanges.forEach((range, i) => {
-      if (uniqueMap.get(range)) {
+    for (let i = 0; i < countRanges.length; i++) {
+      if (uniqueMap.get(countRanges[i])) {
         setInvalidIndex(i);
-        setInvalidFeedback('Having duplicate number.');
+        setInvalidFeedback('Having a duplicated number.');
+        return;
       }
-      uniqueMap.set(range, true);
-    })
+      uniqueMap.set(countRanges[i], true);
+    }
+
+    if (id) {
+      dispatch(modifyGraph({
+        id: id,
+        indicator: abbrev,
+        params: { ranges: countRanges.join(';') }
+      }));
+    } else {
+      dispatch(addGraph({ 
+        indicator: abbrev,
+        params: { ranges: countRanges.join(';') }
+      }));
+    }
+
+    afterSubmit();
   }, [countRanges]);
 
   return (
     <>
       <h5 className="text-center mb-4">{indicatorName}</h5>
-      <form onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         {
           countRanges.map((range, i) => (
               <InputGroup key={i} hasValidation className="params-wrapper mb-4">
@@ -108,7 +130,7 @@ function MovingAverageForm({ indicatorName, abbrev, maxRangesCount }: {
         }
         </div>
         <input type="submit" value="ok" />
-      </form>
+      </Form>
     </>
   )
 }

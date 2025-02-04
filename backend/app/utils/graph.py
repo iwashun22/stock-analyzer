@@ -43,7 +43,7 @@ def generate_img(symbol, request_args, past = "1y"):
         close_prices=data['Close'],
         suptitle=indicator
       )
-      success, error_message = handle_sma(request_args, data, draw, ax)
+      success, error_message = handle_sma(request_args, data, draw, ax) if indicator == 'SMA' else handle_ema(request_args, data, draw, ax)
     elif indicator == 'ADX':
       fig, ax, draw = _draw_graph(
         data,
