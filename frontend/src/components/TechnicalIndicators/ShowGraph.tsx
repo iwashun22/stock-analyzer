@@ -12,34 +12,18 @@ import './ShowGraph.scss';
 function ShowGraph({ indicatorMap }: {
   indicatorMap: Map<string, string>
 }) {
-  const graph = useSelector((state: RootState) => state.graph.list);
-  const target = useSelector((state: RootState) => state.target);
-  const [targetChanged, setTargetChanged] = useState(true);
-  const [countLoaded, setCountLoaded] = useState(0);
-
-  useEffect(() => {
-    setTargetChanged(false);
-    setCountLoaded(0);
-  }, [graph]);
-
-  useEffect(() => {
-    setTargetChanged(true);
-    setCountLoaded(0);
-  }, [target]);
+  const graphs = useSelector((state: RootState) => state.graph.list);
 
   return (
     <div className="graph-container">
       {
-        graph.map((v, i) => 
+        graphs.map((v, i) => 
           <Graph
             indicator={v.indicator}
             fullname={indicatorMap.get(v.indicator) as string}
             params={v.params}
-            symbol={target.symbol}
-            period={target.period}
             id={v.id} key={i}
-            order={(i+1) - countLoaded}
-            targetChanged={targetChanged}
+            order={i}
           />
         )
       }
@@ -47,28 +31,41 @@ function ShowGraph({ indicatorMap }: {
   )
 }
 
-function Graph({ indicator, fullname, params, symbol, period, id, order, targetChanged }: {
+const delay = (ms: number) =>
+  ms <= 0 ? null : new Promise(resolve => setTimeout(resolve, ms));
+
+function Graph({ indicator, fullname, params, id, order }: {
   indicator: string,
   fullname: string,
   params: { [key: string]: any },
-  symbol: string,
-  period: string,
   id: string,
-  order: number,
-  targetChanged: boolean,
+  order: number
 }) {
   const [loaded, setLoaded] = useState(false);
-  const [reload, setReload] = useState(false);
   const [error, setError] = useState(false);
+  const [requireReload, setRequireReload] = useState(true);
+  const [loadAllGraphs, setLoadAllGraphs] = useState(true);
   const [dataUrl, setDataUrl] = useState('');
   const [showEditForm, setShowEditForm] = useState(false);
+  const { symbol, period } = useSelector((state: RootState) => state.target);
+  const graphs = useSelector((state: RootState) => state.graph.list);
   const dispatch = useDispatch();
-  const delay = useCallback((ms: number) =>
-    ms <= 0 ? null : new Promise(resolve => setTimeout(resolve, ms)),
-  []);
 
   useEffect(() => {
-    if (!targetChanged && dataUrl && !reload) return;
+    setLoadAllGraphs(false);
+  }, []);
+
+  useEffect(() => {
+    setRequireReload(true);
+    setLoadAllGraphs(true);
+  }, [symbol, period]);
+
+  useEffect(() => {
+    setLoadAllGraphs(false);
+  }, [graphs])
+
+  useEffect(() => {
+    if (dataUrl && !requireReload) return;
 
     setLoaded(false);
     const obj = {
@@ -80,7 +77,10 @@ function Graph({ indicator, fullname, params, symbol, period, id, order, targetC
     const queryString = new URLSearchParams(obj).toString();
 
     const fetchGraph = async () => {
-      await delay(order * 1000);
+      // make each fetch delay in order if loading all graphs.
+      if (loadAllGraphs) {
+        await delay(order * 1000);
+      }
 
       try  {
         const response = await axios.get(`/api/graph?${queryString}`);
@@ -95,14 +95,21 @@ function Graph({ indicator, fullname, params, symbol, period, id, order, targetC
         setLoaded(true);
         setError(true);
       }
+
+      setRequireReload(false);
     }
 
     fetchGraph();
-  }, [order, targetChanged, reload]);
+  }, [order, requireReload, loadAllGraphs]);
 
   const handleDelete = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    dispatch(deleteGraph(id));
+    setLoaded(false);
+
+    setTimeout(() => {
+      dispatch(deleteGraph(id));
+      setLoaded(true);
+    }, 400);
   }, [id]);
 
   if (!loaded) return (
@@ -122,7 +129,7 @@ function Graph({ indicator, fullname, params, symbol, period, id, order, targetC
           indicator={[indicator, fullname]}
           defaultParams={{ ...params }}
           modifyId={id}
-          afterSubmit={() => { setShowEditForm(false); setReload(true); }}
+          afterSubmit={() => { setShowEditForm(false); setRequireReload(true); }}
         />
       </Popup>
       <div className="text-center">
