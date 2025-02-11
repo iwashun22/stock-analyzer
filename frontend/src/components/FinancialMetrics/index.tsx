@@ -18,8 +18,8 @@ function FinancialMetrics() {
       })
   }, [])
   return (
-    <div className="text-light">
-      <div>FinancialMetrics</div>
+    <div className="text-light mt-3">
+      <h2 className="text-center">Financial Metrics</h2>
       <div className="table-container">
         <ValuationMetrics info={info}/>
       </div>

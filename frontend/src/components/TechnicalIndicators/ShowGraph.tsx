@@ -7,12 +7,99 @@ import axios from 'axios';
 import { FaTrashAlt, FaEdit } from 'react-icons/fa';
 import Popup from '../Popup';
 import IndicatorForm from './IndicatorForm';
+import { BiError } from 'react-icons/bi';
+import { delay } from '@/util/helper';
 import './ShowGraph.scss';
 
 function ShowGraph({ indicatorMap }: {
   indicatorMap: Map<string, string>
 }) {
   const graphs = useSelector((state: RootState) => state.graph.list);
+  const { symbol, period } = useSelector((state: RootState) => state.target);
+  const [images, setImages] = useState<Array<{ id: string, url: string | undefined }>>(graphs.map(v => { return { id: v.id, url: '' } }));
+  const [graphAdded, setGraphAdded] = useState(true);
+  const [reloadAll, setReloadAll] = useState(false);
+
+  useEffect(() => {
+    if (reloadAll) {
+      // This means that the symbol or the period has changed.
+      // It is required to reload all images.
+      setImages(graphs.map(v => {
+        return {
+          id: v.id,
+          url: '',
+        }
+      }));
+    }
+
+    const fetchImages = async () => {
+      for (let i=0; i < graphs.length; i++) {
+        // Skip unnecessary reload if one graph is added.
+        if (images[i].url && graphAdded) continue;
+
+        try {
+          const obj = {
+            indicator: graphs[i].indicator,
+            period,
+            symbol,
+            ...graphs[i].params
+          }
+          await delay(600);
+          const response = await axios.get(`/api/graph`, {
+            params: obj,
+            responseType: 'blob'
+          });
+          const imageUrl = URL.createObjectURL(response.data);
+
+          setImages(state => {
+            const copied = [...state];
+            copied[i] = {
+              id: graphs[i].id,
+              url: imageUrl,
+            }
+            return copied;
+          })
+        }
+        catch (err) {
+          setImages(state => {
+            const copied = [...state];
+            copied[i].url = undefined;
+            return copied;
+          })
+        }
+      }
+    }
+
+    fetchImages()
+      .then(() => {
+        setGraphAdded(false);
+        setReloadAll(false);
+      });
+
+    return () => {
+      images.forEach(image => {
+        if (image.url) {
+          URL.revokeObjectURL(image.url);
+        }
+      });
+    }
+  }, [reloadAll, graphAdded]);
+
+  useEffect(() => {
+    setReloadAll(true);
+  }, [symbol, period]);
+
+  useEffect(() => {
+    if (graphs.length > images.length) {
+      setImages(state =>
+        [...state, { id: graphs[graphs.length - 1].id, url: '' }]
+      );
+      setGraphAdded(true);
+    }
+    else {
+      setGraphAdded(false);
+    }
+  }, [graphs])
 
   return (
     <div className="graph-container">
@@ -23,7 +110,8 @@ function ShowGraph({ indicatorMap }: {
             fullname={indicatorMap.get(v.indicator) as string}
             params={v.params}
             id={v.id} key={i}
-            order={i}
+            imageUrl={images[i]?.url}
+            deleteFromList={() => setImages(state => state.filter(x => x.id !== v.id))}
           />
         )
       }
@@ -31,76 +119,84 @@ function ShowGraph({ indicatorMap }: {
   )
 }
 
-const delay = (ms: number) =>
-  ms <= 0 ? null : new Promise(resolve => setTimeout(resolve, ms));
 
-function Graph({ indicator, fullname, params, id, order }: {
+function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
   indicator: string,
   fullname: string,
   params: { [key: string]: any },
   id: string,
-  order: number
+  imageUrl: string | undefined,
+  deleteFromList: () => unknown,
 }) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
-  const [requireReload, setRequireReload] = useState(true);
-  const [loadAllGraphs, setLoadAllGraphs] = useState(true);
-  const [dataUrl, setDataUrl] = useState('');
+  const [requireReload, setRequireReload] = useState(false);
+  const [dataUrl, setDataUrl] = useState(imageUrl);
   const [showEditForm, setShowEditForm] = useState(false);
   const { symbol, period } = useSelector((state: RootState) => state.target);
   const graphs = useSelector((state: RootState) => state.graph.list);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    setLoadAllGraphs(false);
-  }, []);
+    // memo: if imageUrl (image.url) is undefined, an error has occurred.
+    if (imageUrl === undefined) {
+      setError(false);
+      setLoaded(false);
+    }
+    // memo: if imageUrl is an empty string, it is in a loading state.
+    else if (imageUrl === '') {
+      setError(true);
+      setLoaded(true);
+    }
+    else {
+      setError(false);
+      setLoaded(true);
+    }
+  }, [imageUrl]);
 
   useEffect(() => {
-    setRequireReload(true);
-    setLoadAllGraphs(true);
-  }, [symbol, period]);
-
-  useEffect(() => {
-    setLoadAllGraphs(false);
-  }, [graphs])
-
-  useEffect(() => {
-    if (dataUrl && !requireReload) return;
+    if (!requireReload) return;
 
     setLoaded(false);
-    const obj = {
-      indicator,
-      symbol,
-      period,
-      ...params,
-    }
-    const queryString = new URLSearchParams(obj).toString();
 
-    const fetchGraph = async () => {
-      // make each fetch delay in order if loading all graphs.
-      if (loadAllGraphs) {
-        await delay(order * 1000);
-      }
-
-      try  {
-        const response = await axios.get(`/api/graph?${queryString}`);
-        const dataUrl = response.data.imageUrl ?? '';
-
-        if (!dataUrl) throw new Error();
-
-        setDataUrl(dataUrl);
-        setLoaded(true);
+    const fetchNewImage = async () => {
+      try {
+        const response = await axios.get('/api/graph', {
+          params: {
+            indicator,
+            symbol,
+            period,
+            ...params,
+          },
+          responseType: 'blob',
+        });
+        const newUrl = URL.createObjectURL(response.data);
+        if (typeof dataUrl === 'string') URL.revokeObjectURL(dataUrl);
+        setDataUrl(newUrl);
       }
       catch (err) {
-        setLoaded(true);
         setError(true);
       }
-
-      setRequireReload(false);
+      finally {
+        setLoaded(true);
+        setRequireReload(false);
+      }
     }
 
-    fetchGraph();
-  }, [order, requireReload, loadAllGraphs]);
+    fetchNewImage();
+  }, [requireReload, graphs])
+
+  useEffect(() => {
+    if (imageUrl === '') {
+      setError(false);
+      setLoaded(false);
+    }
+    else {
+      setError(imageUrl ? false : true);
+      setDataUrl(imageUrl);
+      setLoaded(true);
+    }
+  }, [imageUrl])
 
   const handleDelete = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -109,6 +205,7 @@ function Graph({ indicator, fullname, params, id, order }: {
     setTimeout(() => {
       dispatch(deleteGraph(id));
       setLoaded(true);
+      deleteFromList();
     }, 400);
   }, [id]);
 
@@ -119,7 +216,11 @@ function Graph({ indicator, fullname, params, id, order }: {
   )
 
   if (error) return (
-    <div></div>
+    <Template 
+      indicator={indicator}
+      deleteButtonOnClick={handleDelete}
+      hideEdit
+    />
   )
 
   return (
@@ -132,23 +233,55 @@ function Graph({ indicator, fullname, params, id, order }: {
           afterSubmit={() => { setShowEditForm(false); setRequireReload(true); }}
         />
       </Popup>
-      <div className="text-center">
-        <div className="config-container">
-          <h5 className="text-light indicator-name">{indicator}</h5>
-          <div>
-            <button className="edit-btn" onClick={() => setShowEditForm(true)}>
+      <Template
+        indicator={indicator}
+        dataUrl={dataUrl}
+        editButtonOnClick={() => setShowEditForm(true)}
+        deleteButtonOnClick={handleDelete}
+      />
+    </>
+  )
+}
+
+type TemplateProps = {
+  indicator: string,
+  dataUrl?: string,
+  hideEdit?: boolean,
+  editButtonOnClick?: (e: React.MouseEvent) => unknown,
+  deleteButtonOnClick?: (e: React.MouseEvent) => unknown,
+};
+function Template({ 
+  indicator,
+  dataUrl = '',
+  hideEdit = false,
+  editButtonOnClick = () => {},
+  deleteButtonOnClick = () => {},
+}: TemplateProps) {
+  return (
+    <div className="text-center mb-4">
+      <div className="config-container">
+        <h5 className="text-light indicator-name">{indicator}</h5>
+        <div>
+          {
+            !hideEdit &&
+            <button className="edit-btn" onClick={editButtonOnClick}>
               <FaEdit className="icon"/>
             </button>
-            <button className="delete-btn" onClick={handleDelete}>
-              <FaTrashAlt className="icon"/>
-            </button>
-          </div>
+          }
+          <button className="delete-btn" onClick={deleteButtonOnClick}>
+            <FaTrashAlt className="icon"/>
+          </button>
         </div>
-        <span className="graph-image-wrapper">
-          <img src={dataUrl} alt={`Indicator graph (${indicator})`} />
-        </span>
       </div>
-    </>
+      <span className="graph-image-wrapper">
+        {
+          !dataUrl ?
+          <BiError className="error-img-icon"/>
+          :
+          <img src={dataUrl} alt={`Indicator graph (${indicator})`} />
+        }
+      </span>
+    </div>
   )
 }
 

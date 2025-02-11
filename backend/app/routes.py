@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from .utils.helpers import get_info, get_property
 from .utils.graph import *
 
@@ -58,12 +58,15 @@ def generate_graph():
   symbol = get_property(request.args, "symbol").upper()
   period = get_property(request.args, "period", "1y")
 
-  data, error_message = generate_img(symbol, request.args, period)
+  try:
+    buffer, error_message = generate_img(symbol, request.args, period)
 
-  if not data:
-    return error_message, 400
+    if not buffer:
+      return error_message, 400
 
-  return jsonify(data)
+    return send_file(buffer, mimetype="image/png")
+  except:
+    return 'Something went wrong', 400
 
 @api_blueprint.route('/check/period/<string:period>')
 def check_period_validity(period):

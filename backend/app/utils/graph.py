@@ -1,5 +1,5 @@
 import yfinance as yf
-import base64, io, matplotlib.pyplot as plt
+import io, matplotlib.pyplot as plt
 import datetime as dt, numpy as np
 from dateutil.relativedelta import relativedelta
 from .helpers import parse_time_period, get_property, resolve_path
@@ -113,11 +113,8 @@ def generate_img(symbol, request_args, past = "1y"):
   buffer.seek(0)
 
   # encoding base64 data url
-  img_base64 = base64.b64encode(buffer.read()).decode('utf-8')
-  response_data["imageUrl"] = f"data:image/png;base64,{img_base64}"
-  buffer.close()
   plt.close()
-  return response_data, None
+  return buffer, None
 
 
 def _draw_graph(
