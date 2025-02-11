@@ -25,7 +25,7 @@ function TechnicalIndicators() {
     axios.get('/api/indicators')
       .then(response => {
         setIndicators(response.data);
-        const mapArr = [];
+        const mapArr: Array<[string, string]> = [];
         Object.entries(response.data).forEach(([key, value]) => {
           Object.entries(value as object).forEach((indicatorSet) => {
             mapArr.push(indicatorSet);
