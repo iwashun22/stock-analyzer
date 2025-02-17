@@ -5,32 +5,39 @@
   align-items: center;
 
   .indicator-name {
-    margin-right: 2rem;
+    // margin-right: 2rem;
     margin-bottom: 0 !important;
+    font-weight: bolder;
   }
 
-  .edit-btn, .delete-btn {
+  button {
     background-color: transparent;
     padding: 10px 10px;
     border: none;
 
     .icon {
       display: block;
+      width: 18px;
+      height: 18px;
     }
   }
 
   .edit-btn .icon {
     color: rgb(54, 96, 164);
-
     &:hover {
       color: rgb(28, 64, 122);
     }
   }
   .delete-btn .icon {
     color: red;
-
     &:hover {
       color: rgb(152, 0, 0);
+    }
+  }
+  .info-btn .icon {
+    color: #eee;
+    &:hover {
+      color: #ccc;
     }
   }
 }
@@ -38,10 +45,13 @@
 .graph-image-wrapper {
   display: inline-block;
   max-width: 90vw;
-  height: 80vh;
+  min-width: 200px;
+  min-height: 130px;
   max-height: 700px;
   overflow-x: scroll;
   border-radius: 20px;
+  position: relative;
+  overflow-x: scroll;
 
   &::-webkit-scrollbar {
     display: none;
@@ -53,9 +63,13 @@
   }
 
   .error-img-icon {
+    position: absolute;
     width: 80px;
     height: 80px;
     color: #ddd;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
   }
 }
 

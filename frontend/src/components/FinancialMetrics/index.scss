@@ -3,4 +3,8 @@
   max-width: 1000px;
   margin: auto;
   overflow-x: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

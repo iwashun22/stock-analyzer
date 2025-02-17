@@ -3,13 +3,15 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { useDispatch } from 'react-redux';
 import { addGraph, modifyGraph } from '@/features/graphSlice';
+import FormActionButtons from './FormActionButtons';
 import './MovingAverageForm.scss';
 
-function MACDForm({ indicatorName, defaultParams, id, afterSubmit }: {
+function MACDForm({ indicatorName, defaultParams, id, afterSubmit, closeForm }: {
   indicatorName: string,
   defaultParams: { [key: string]: any },
   id: string,
-  afterSubmit: () => unknown
+  afterSubmit: () => unknown,
+  closeForm: undefined | (() => unknown)
 }) {
   const [fastperiod, setFastperiod] = useState(defaultParams["fastperiod"] || '12');
   const [slowperiod, setSlowperiod] = useState(defaultParams["slowperiod"] || '26');
@@ -104,7 +106,7 @@ function MACDForm({ indicatorName, defaultParams, id, afterSubmit }: {
           </InputGroup>
         ))
       }
-      <input type="submit" value="ok"/>
+      <FormActionButtons closeForm={closeForm} />
     </Form>
     </>
   )

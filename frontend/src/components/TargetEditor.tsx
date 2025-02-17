@@ -59,26 +59,26 @@ function TargetEditor() {
       <Popup variant='error' show={!!error} onClose={() => setError('')}>
         <h5 className="text-center">{error}</h5>
       </Popup>
-    <div className="target-wrapper text-light">
-      <div className="symbol-wrapper" onClick={confirmClick}>
-        <span className="text-lowercase">symbol</span>
-        <span className="text-uppercase">{target.symbol}</span>
+      <div className="target-wrapper text-light">
+        <div className="symbol-wrapper" onClick={confirmClick}>
+          <span className="text-lowercase">symbol</span>
+          <span className="text-uppercase">{target.symbol}</span>
+        </div>
+        <div className="period-wrapper">
+          <span className="text-capitalize">past</span>
+          <span className="number">
+            {savedPeriod[0]}
+          </span>
+          <span className="text-capitalize">
+            {UNITS[savedPeriod[1] as SupportedUnit]}
+          </span>
+          <span className="ms-3">
+            <button className="edit-btn" onClick={() => setShowPeriodEditor(true)}>
+              <FaEdit size={20} className="d-block"/>
+            </button>
+          </span>
+        </div>
       </div>
-      <div className="period-wrapper">
-        <span className="text-capitalize">past</span>
-        <span className="number">
-          {savedPeriod[0]}
-        </span>
-        <span className="text-capitalize">
-          {UNITS[savedPeriod[1] as SupportedUnit]}
-        </span>
-        <span className="ms-3">
-          <button className="edit-btn" onClick={() => setShowPeriodEditor(true)}>
-            <FaEdit size={20} className="d-block"/>
-          </button>
-        </span>
-      </div>
-    </div>
     </>
   )
 }
@@ -154,7 +154,7 @@ function PeriodConfigForm({
   return (
     <Form onSubmit={handleTargetPeriodSubmit} noValidate>
       <div>
-        <h5 className="text-center mb-4">Period of time</h5>
+        <h5 className="text-center mb-3">Period of time</h5>
       </div>
       <div className="w-100 d-inline-flex justify-content-center">
       <Form.Group className="number-input-container">

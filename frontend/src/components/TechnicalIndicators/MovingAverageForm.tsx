@@ -4,15 +4,17 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { LuCircleMinus, LuCirclePlus } from 'react-icons/lu';
 import { useDispatch } from 'react-redux';
 import { addGraph, modifyGraph } from '@/features/graphSlice';
+import FormActionButtons from './FormActionButtons';
 import './MovingAverageForm.scss';
 
-function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParams, id, afterSubmit }: {
+function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParams, id, afterSubmit, closeForm }: {
   indicatorName: string,
   abbrev: string,
   maxRangesCount: number,
   defaultParams?: { [key: string]: any },
   id: string,
-  afterSubmit: () => unknown
+  afterSubmit: () => unknown,
+  closeForm: undefined | (() => unknown),
 }) {
   const [countRanges, setCountRanges] = useState<Array<string>>(defaultParams?.ranges?.split(';') || ['12']);
   const [invalidIndex, setInvalidIndex] = useState(-1);
@@ -92,7 +94,7 @@ function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParam
         {
           countRanges.map((range, i) => (
               <InputGroup key={i} hasValidation className="params-wrapper mb-4">
-                <InputGroup.Text>Range {i+1}</InputGroup.Text>
+                <InputGroup.Text>Range {maxRangesCount > 1 && i+1}</InputGroup.Text>
                 <Form.Control
                   className="form-input"
                   type="text"
@@ -129,7 +131,7 @@ function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParam
           </button>
         }
         </div>
-        <input type="submit" value="ok" />
+        <FormActionButtons closeForm={closeForm}/>
       </Form>
     </>
   )

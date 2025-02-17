@@ -1,0 +1,12 @@
+.description-container {
+  font-family: Garamond, serif;
+  max-height: 70vh;
+  overflow-y: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-container {
+  }
+}

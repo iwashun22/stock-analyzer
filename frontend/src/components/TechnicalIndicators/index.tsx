@@ -88,7 +88,14 @@ function TechnicalIndicators() {
                 }
               </div>
             ))
-          : <IndicatorForm indicator={split(selectedIndicator)}/>
+          : 
+          <IndicatorForm
+            indicator={split(selectedIndicator)}
+            closeForm={() => {
+              setSelectedIndicator('');
+              setShowForm(false);
+            }}
+          />
         }
       </Popup>
     </>

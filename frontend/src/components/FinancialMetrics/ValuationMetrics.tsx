@@ -13,7 +13,7 @@ function ValuationMetrics({ info }: {
     { represent: 'P/B Ratio', keyName: 'priceToBook' },
   ]);
   return (
-    <Table bordered hover responsive>
+    <Table bordered hover>
       <thead>
         <tr>
           {

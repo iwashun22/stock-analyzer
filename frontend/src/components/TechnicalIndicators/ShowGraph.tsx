@@ -4,9 +4,10 @@ import { deleteGraph } from '@/features/graphSlice';
 import type { RootState } from '@/store';
 import Spinner from 'react-bootstrap/Spinner';
 import axios from 'axios';
-import { FaTrashAlt, FaEdit } from 'react-icons/fa';
+import { FaTrashAlt, FaEdit, FaRegQuestionCircle } from 'react-icons/fa';
 import Popup from '../Popup';
 import IndicatorForm from './IndicatorForm';
+import Docs from './Description';
 import { BiError } from 'react-icons/bi';
 import { delay } from '@/util/helper';
 import './ShowGraph.scss';
@@ -133,6 +134,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
   const [requireReload, setRequireReload] = useState(false);
   const [dataUrl, setDataUrl] = useState(imageUrl);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [showDescription, setShowDescription] = useState(false);
   const { symbol, period } = useSelector((state: RootState) => state.target);
   const graphs = useSelector((state: RootState) => state.graph.list);
   const dispatch = useDispatch();
@@ -151,6 +153,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
     else {
       setError(false);
       setLoaded(true);
+      setDataUrl(imageUrl);
     }
   }, [imageUrl]);
 
@@ -176,6 +179,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
       }
       catch (err) {
         setError(true);
+        console.error(err);
       }
       finally {
         setLoaded(true);
@@ -216,11 +220,17 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
   )
 
   if (error) return (
-    <Template 
-      indicator={indicator}
-      deleteButtonOnClick={handleDelete}
-      hideEdit
-    />
+    <>
+      <Popup show={showDescription} onClose={() => setShowDescription(false)}>
+        <Docs indicator={indicator} fullname={fullname}/>
+      </Popup>
+      <Template 
+        indicator={indicator}
+        deleteButtonOnClick={handleDelete}
+        helpButtonOnClick={() => setShowDescription(true)}
+        hideEdit
+      />
+    </>
   )
 
   return (
@@ -231,12 +241,17 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
           defaultParams={{ ...params }}
           modifyId={id}
           afterSubmit={() => { setShowEditForm(false); setRequireReload(true); }}
+          closeForm={() => setShowEditForm(false)}
         />
+      </Popup>
+      <Popup show={showDescription} onClose={() => setShowDescription(false)}>
+        <Docs indicator={indicator} fullname={fullname}/>
       </Popup>
       <Template
         indicator={indicator}
         dataUrl={dataUrl}
         editButtonOnClick={() => setShowEditForm(true)}
+        helpButtonOnClick={() => setShowDescription(true)}
         deleteButtonOnClick={handleDelete}
       />
     </>
@@ -247,6 +262,7 @@ type TemplateProps = {
   indicator: string,
   dataUrl?: string,
   hideEdit?: boolean,
+  helpButtonOnClick?: (e: React.MouseEvent) => unknown,
   editButtonOnClick?: (e: React.MouseEvent) => unknown,
   deleteButtonOnClick?: (e: React.MouseEvent) => unknown,
 };
@@ -254,13 +270,17 @@ function Template({
   indicator,
   dataUrl = '',
   hideEdit = false,
+  helpButtonOnClick = () => {},
   editButtonOnClick = () => {},
   deleteButtonOnClick = () => {},
 }: TemplateProps) {
   return (
     <div className="text-center mb-4">
       <div className="config-container">
-        <h5 className="text-light indicator-name">{indicator}</h5>
+        <button className="info-btn" onClick={helpButtonOnClick}>
+          <FaRegQuestionCircle className="icon"/>
+        </button>
+        <h5 className="text-light indicator-name mx-4">{indicator}</h5>
         <div>
           {
             !hideEdit &&
