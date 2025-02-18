@@ -153,7 +153,6 @@ function PeriodConfigForm({
 
   const handleTargetPeriodSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(selectedInterval);
     try {
       if (!+period[0] || !isValidNumber) {
         setIsValidNumber(false);
@@ -178,10 +177,6 @@ function PeriodConfigForm({
     // e.preventDefault();
     setSelectedInterval(e.target.value);
   }, []);
-
-  useEffect(() => {
-    console.log(selectedInterval);
-  }, [selectedInterval])
 
   return (
     <Form onSubmit={handleTargetPeriodSubmit} noValidate>
@@ -218,11 +213,14 @@ function PeriodConfigForm({
       <div>
         <h5 className="text-center mb-3">Interval</h5>
       </div>
-      <Form.Group className="interval-btn-container">
+      <Form.Group className="px-3 d-flex justify-content-center align-items-center flex-wrap">
           {
             intervalList.map((option, i) => (
-              <span className="interval-btn" key={i}>
-                <label htmlFor={i.toString()}>
+              <span className="interval-btn mx-1 mb-2" key={i}>
+                <label
+                  htmlFor={i.toString()}
+                  className={selectedInterval === option ? "selected" : undefined}
+                >
                   {option}
                 </label>
                 <input

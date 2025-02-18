@@ -149,12 +149,12 @@ def handle_macd(request_args, data, draw, ax):
     # When MACD line crosses over the Signal line
     if macd.iloc[i-1] < signal.iloc[i-1] and macd.iloc[i] > signal.iloc[i]:
       buy_label = 'Buy Signal' if not buy_label_added else None
-      ax.axvline(data.index[i], color='green', linestyle='dotted', alpha=0.5, label=buy_label)
+      ax.axvline(data["time_str"].iloc[i], color='green', linestyle='dotted', alpha=0.5, label=buy_label)
       buy_label_added = True
     # When MACD line crosses down the Signal line
     elif macd.iloc[i-1] > signal.iloc[i-1] and macd.iloc[i] < signal.iloc[i]:
       sell_label = 'Sell Signal' if not sell_label_added else None
-      ax.axvline(data.index[i], color='red', linestyle='dotted', alpha=0.5, label=sell_label)
+      ax.axvline(data["time_str"].iloc[i], color='red', linestyle='dotted', alpha=0.5, label=sell_label)
       sell_label_added = True
 
   return True, None

@@ -212,7 +212,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
       dispatch(deleteGraph(id));
       setLoaded(true);
       deleteFromList();
-    }, 400);
+    }, 300);
   }, [id]);
 
   if (!loaded) return (

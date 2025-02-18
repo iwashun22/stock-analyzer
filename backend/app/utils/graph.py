@@ -33,7 +33,7 @@ def generate_img(symbol, request_args, past="1y", interval="1d"):
   if data.empty:
     return None, "Data is empty."
 
-  # dt_index = data.index.tolist()
+  data["time_str"] = data.index.strftime("%Y-%m-%d %H:%M")
 
   indicator = get_property(request_args, "indicator").upper()
   success, error_message, fig = None, None, None
@@ -103,8 +103,14 @@ def generate_img(symbol, request_args, past="1y", interval="1d"):
     bbox_to_anchor=(1.05, 1),
     borderaxespad=0.
   )
+
+  # Set a fixed number of labels
+  num_labels = 8
+  step = len(data) // num_labels
+  selected_labels = data["time_str"][::step]
+  ax.set_xticks(range(0, len(data), step))  # Set tick positions
+  ax.set_xticklabels(selected_labels, rotation=45)  # Set tick labels
   plt.tight_layout()
-  fig.autofmt_xdate()
 
   # save to preview_img when it is 'test' mode.
   filename = resolve_path(f"example_{indicator.lower()}.png")
@@ -133,7 +139,7 @@ def _draw_graph(
 ):
   data_length = len(data)
 
-  fig_width = max(10, (data_length / 40))
+  fig_width = max(10, (data_length / 100))
   fig, ax = plt.subplots(figsize=(fig_width, 6))
   ax.grid(grid)
 
@@ -144,7 +150,7 @@ def _draw_graph(
 
   try:
     if not close_prices.empty:
-      ax.plot(data.index, close_prices, label="Close Price")
+      ax.plot(data["time_str"], close_prices, label="Close Price")
   except:
     pass
 
@@ -153,13 +159,13 @@ def _draw_graph(
 
   def draw(plot=None, pltype="plot", include_nan=False, *args, **kwargs):
     if pltype == "plot":
-      ax.plot(data.index, plot, *args, **kwargs)
+      ax.plot(data["time_str"], plot, *args, **kwargs)
     elif pltype == "bar":
-      ax.bar(data.index, plot, *args, **kwargs)
+      ax.bar(data["time_str"], plot, *args, **kwargs)
 
     if include_nan:
       nan_indices = np.where(np.isnan(plot))
       min_value = np.min(data['Close'])
-      ax.plot(data.index[nan_indices], [min_value if price_based else 0] * len(nan_indices[0]), color='gray', dashes=[6, 2])
+      ax.plot(data["time_str"].iloc[nan_indices], [min_value if price_based else 0] * len(nan_indices[0]), color='gray', dashes=[6, 2])
 
   return fig, ax, draw
