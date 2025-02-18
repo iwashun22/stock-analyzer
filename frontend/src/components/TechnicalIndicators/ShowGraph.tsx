@@ -16,7 +16,7 @@ function ShowGraph({ indicatorMap }: {
   indicatorMap: Map<string, string>
 }) {
   const graphs = useSelector((state: RootState) => state.graph.list);
-  const { symbol, period } = useSelector((state: RootState) => state.target);
+  const { symbol, period, interval } = useSelector((state: RootState) => state.target);
   const [images, setImages] = useState<Array<{ id: string, url: string | undefined }>>(graphs.map(v => { return { id: v.id, url: '' } }));
   const [graphAdded, setGraphAdded] = useState(true);
   const [reloadAll, setReloadAll] = useState(false);
@@ -43,6 +43,7 @@ function ShowGraph({ indicatorMap }: {
             indicator: graphs[i].indicator,
             period,
             symbol,
+            interval,
             ...graphs[i].params
           }
           await delay(600);
@@ -88,7 +89,7 @@ function ShowGraph({ indicatorMap }: {
 
   useEffect(() => {
     setReloadAll(true);
-  }, [symbol, period]);
+  }, [symbol, period, interval]);
 
   useEffect(() => {
     if (graphs.length > images.length) {
@@ -135,7 +136,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
   const [dataUrl, setDataUrl] = useState(imageUrl);
   const [showEditForm, setShowEditForm] = useState(false);
   const [showDescription, setShowDescription] = useState(false);
-  const { symbol, period } = useSelector((state: RootState) => state.target);
+  const { symbol, period, interval } = useSelector((state: RootState) => state.target);
   const graphs = useSelector((state: RootState) => state.graph.list);
   const dispatch = useDispatch();
 
@@ -169,6 +170,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
             indicator,
             symbol,
             period,
+            interval,
             ...params,
           },
           responseType: 'blob',

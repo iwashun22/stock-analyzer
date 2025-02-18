@@ -107,6 +107,36 @@ $symbol-font-size: 26px;
   }
 }
 
+.interval-btn {
+  display: inline-block;
+  width: 40px;
+  height: 30px;
+  position: relative;
+
+  .check-btn {
+    // width: 0;
+    // opacity: 0;
+  }
+
+  label {
+    cursor: pointer;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .check-btn:checked + label {
+    background-color: blue;
+    width: 30px;
+  }
+}
+
 @property --angle {
   syntax: "<angle>";
   initial-value: 0deg;

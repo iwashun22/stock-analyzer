@@ -4,7 +4,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { LuCircleMinus, LuCirclePlus } from 'react-icons/lu';
 import { useDispatch } from 'react-redux';
 import { addGraph, modifyGraph } from '@/features/graphSlice';
-import FormActionButtons from './FormActionButtons';
+import FormActionButtons from '../FormActionButtons';
 import './MovingAverageForm.scss';
 
 function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParams, id, afterSubmit, closeForm }: {

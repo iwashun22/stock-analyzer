@@ -1,13 +1,13 @@
 import React, { useEffect, useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updatePeriod } from '@/features/targetSlice';
+import { updatePeriod, updateInterval } from '@/features/targetSlice';
 import type { RootState } from '@/store';
 import { useNavigate } from 'react-router';
 import { UNITS, type SupportedUnit } from '@/util/helper';
 import Popup from './Popup';
 import Form from 'react-bootstrap/Form';
+import FormActionButtons from './FormActionButtons';
 import { FaEdit } from 'react-icons/fa';
-import Button from 'react-bootstrap/Button';
 import './TargetEditor.scss';
 
 function TargetEditor() {
@@ -37,6 +37,12 @@ function TargetEditor() {
         const defaultPeriod: typeof savedPeriod = [1, 'y'];
         setSavedPeriod(defaultPeriod);
         dispatch(updatePeriod(defaultPeriod.join('')));
+      })
+
+    fetch(`/api/check/interval/${target.interval}`)
+      .catch(err => {
+        console.error(err);
+        dispatch(updateInterval('1d'));
       })
   }, [target]);
 
@@ -97,12 +103,26 @@ function PeriodConfigForm({
   max?: number
 }) {
   const [period, setPeriod] = useState(savedPeriod.map(toStr));
+  const [intervalList, setIntervalList] = useState<Array<string>>([]);
   const [isValidNumber, setIsValidNumber] = useState(true);
+  const savedInterval = useSelector((state: RootState) => state.target.interval);
+  const [selectedInterval, setSelectedInterval] = useState(savedInterval);
   const dispatch = useDispatch();
 
   useEffect(() => {
     setPeriod(savedPeriod.map(toStr));
   }, [savedPeriod]);
+
+  useEffect(() => {
+    fetch('/api/interval/supported')
+      .then(response => response.json())
+      .then(data => {
+        setIntervalList(data);
+      })
+      .catch(err => {
+        console.error(err);
+      })
+  }, []);
 
   const handleNumberOnChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -133,14 +153,17 @@ function PeriodConfigForm({
 
   const handleTargetPeriodSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log(selectedInterval);
     try {
       if (!+period[0] || !isValidNumber) {
         setIsValidNumber(false);
         e.stopPropagation();
       } else {
-        const response = await fetch(`/api/check/period/${period.join('')}`);
-        if (response.ok) {
+        const checkPeriod = await fetch(`/api/check/period/${period.join('')}`);
+        const checkInterval = await fetch(`/api/check/interval/${selectedInterval}`);
+        if (checkPeriod.ok && checkInterval.ok) {
           dispatch(updatePeriod(period.join('')));
+          dispatch(updateInterval(selectedInterval));
           closePopup();
         }
         else throw new Error("Invalid period.");
@@ -149,7 +172,16 @@ function PeriodConfigForm({
     catch (err: unknown) {
       console.error(err);
     }
-  }, [period]);
+  }, [period, selectedInterval]);
+
+  const handleIntervalChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    // e.preventDefault();
+    setSelectedInterval(e.target.value);
+  }, []);
+
+  useEffect(() => {
+    console.log(selectedInterval);
+  }, [selectedInterval])
 
   return (
     <Form onSubmit={handleTargetPeriodSubmit} noValidate>
@@ -183,9 +215,30 @@ function PeriodConfigForm({
         </Form.Select>
       </Form.Group>
       </div>
-      <div className="text-center">
-        <Button type='submit'>Change</Button>
+      <div>
+        <h5 className="text-center mb-3">Interval</h5>
       </div>
+      <Form.Group className="interval-btn-container">
+          {
+            intervalList.map((option, i) => (
+              <span className="interval-btn" key={i}>
+                <label htmlFor={i.toString()}>
+                  {option}
+                </label>
+                <input
+                  id={i.toString()}
+                  className="check-btn"
+                  type="radio"
+                  name="interval"
+                  value={option}
+                  onChange={handleIntervalChange}
+                  checked={selectedInterval === option}
+                />
+              </span>
+            ))
+          }
+      </Form.Group>
+      <FormActionButtons closeForm={closePopup}/>
     </Form>
   )
 }

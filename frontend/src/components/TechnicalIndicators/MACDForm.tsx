@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import { useDispatch } from 'react-redux';
 import { addGraph, modifyGraph } from '@/features/graphSlice';
-import FormActionButtons from './FormActionButtons';
+import FormActionButtons from '../FormActionButtons';
 import './MovingAverageForm.scss';
 
 function MACDForm({ indicatorName, defaultParams, id, afterSubmit, closeForm }: {

@@ -3,6 +3,8 @@ from pytz import timezone
 import numpy as np, datetime as dt, os
 import re
 
+VALID_INTERVAL = ['1m', '5m', '15m', '30m', '1h', '1d', '5d', '1wk', '1mo']
+
 def is_positive_int(number):
   if isinstance(number, int):
     return number > 0
@@ -39,7 +41,7 @@ def resolve_path(filename):
   return None
   
 def parse_time_period(input_str):
-  matched = re.fullmatch(r"^(\d+)([wmy])$", input_str, re.IGNORECASE)
+  matched = re.fullmatch(r"^(\d+)([dwmy])$", input_str, re.IGNORECASE)
   if matched:
     number = int(matched.group(1))
     unit = matched.group(2).lower()

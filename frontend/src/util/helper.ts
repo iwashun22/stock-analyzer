@@ -1,5 +1,6 @@
 
 export const UNITS = {
+  d: 'days',
   w: 'weeks',
   m: 'months',
   y: 'years'

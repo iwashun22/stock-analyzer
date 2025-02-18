@@ -4,12 +4,14 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 export interface targetState {
   symbol: string,
   period: string,
+  interval: string,
   isValidSymbol: boolean,
 }
 
 export const INITIAL_STATE: targetState = {
   symbol: '',
   period: '1y',
+  interval: '1d',
   isValidSymbol: false
 };
 
@@ -23,11 +25,14 @@ export const targetSlice = createSlice({
     updatePeriod: (state, action: PayloadAction<string>) => {
       state.period = action.payload;
     },
+    updateInterval: (state, action: PayloadAction<string>) => {
+      state.interval = action.payload;
+    },
     updateValidity: (state, aciton: PayloadAction<boolean>) => {
       state.isValidSymbol = aciton.payload;
     }
   }
 })
 
-export const { updateSymbol, updatePeriod, updateValidity } = targetSlice.actions;
+export const { updateSymbol, updatePeriod, updateInterval, updateValidity } = targetSlice.actions;
 export default targetSlice.reducer;

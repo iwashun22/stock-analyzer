@@ -2,19 +2,21 @@ import yfinance as yf
 import io, matplotlib.pyplot as plt
 import datetime as dt, numpy as np
 from dateutil.relativedelta import relativedelta
-from .helpers import parse_time_period, get_property, resolve_path
+from .helpers import parse_time_period, get_property, resolve_path, VALID_INTERVAL
 from .handle_indicators import *
 
 TREND_INDICATORS = ('SMA', 'EMA', 'ADX')
 MOMENTUM_INDICATORS = ('RSI', 'MACD')
 VOLATILITY_INDICATORS = ('BBANDS', 'ATR')
 
-def generate_img(symbol, request_args, past = "1y"):
+def generate_img(symbol, request_args, past="1y", interval="1d"):
   ticker = yf.Ticker(symbol)
   now = dt.datetime.now()
   period_format = parse_time_period(past)
   if not period_format:
     return None, "The time period format is invalid."
+  if not interval in VALID_INTERVAL:
+    return None, "The given interval is invalid."
 
   number, unit = period_format
   if unit == "d":
@@ -26,8 +28,7 @@ def generate_img(symbol, request_args, past = "1y"):
   elif unit == "y":
     timedelta = relativedelta(years=number)
 
-  data = ticker.history(start=now - timedelta, end=now, interval="1d")
-  response_data = {}
+  data = ticker.history(start=now - timedelta, end=now, interval=interval)
 
   if data.empty:
     return None, "Data is empty."
@@ -49,7 +50,8 @@ def generate_img(symbol, request_args, past = "1y"):
         data,
         suptitle=indicator,
         grid=False,
-        ylabel="Value"
+        ylabel="Value",
+        price_based=False
       )
       success, error_message = handle_adx(request_args, data, draw, ax)
   elif indicator in MOMENTUM_INDICATORS:
@@ -58,7 +60,8 @@ def generate_img(symbol, request_args, past = "1y"):
           data,
           suptitle=indicator,
           ylabel="Value",
-          grid=False
+          grid=False,
+          price_based=False
         )
       success, error_message = handle_macd(request_args, data, draw, ax)
     elif indicator == 'RSI':
@@ -82,7 +85,8 @@ def generate_img(symbol, request_args, past = "1y"):
       fig, ax, draw = _draw_graph(
         data,
         suptitle=indicator,
-        ylabel="Volatility"
+        ylabel="Volatility",
+        price_based=False
       )
       success, error_message = handle_atr(request_args, data, draw, ax)
   elif indicator:
@@ -124,7 +128,8 @@ def _draw_graph(
   ylimit=None,
   suptitle=None,
   ylabel="Price",
-  xlabel="Date"
+  xlabel="Date",
+  price_based=True,
 ):
   data_length = len(data)
 
@@ -154,6 +159,7 @@ def _draw_graph(
 
     if include_nan:
       nan_indices = np.where(np.isnan(plot))
-      ax.plot(data.index[nan_indices], [0] * len(nan_indices[0]), color='gray', dashes=[6, 2])
+      min_value = np.min(data['Close'])
+      ax.plot(data.index[nan_indices], [min_value if price_based else 0] * len(nan_indices[0]), color='gray', dashes=[6, 2])
 
   return fig, ax, draw

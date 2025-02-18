@@ -1,6 +1,8 @@
 from flask import Blueprint, request, jsonify, send_file
-from .utils.helpers import get_info, get_property
+from .utils.helpers import get_info, get_property, VALID_INTERVAL
 from .utils.graph import *
+import re
+from collections import OrderedDict
 
 api_blueprint = Blueprint('api', __name__)
 
@@ -52,14 +54,19 @@ def indicators():
     "volatility-indicators": volatility_dict
   })
 
+@api_blueprint.route('/interval/supported')
+def interval_supported():
+  return jsonify(VALID_INTERVAL)
+
 # format url /graph?symbol=<s>&period=<p>&indicator=<i>...
 @api_blueprint.route('/graph')
 def generate_graph():
   symbol = get_property(request.args, "symbol").upper()
   period = get_property(request.args, "period", "1y")
+  interval = get_property(request.args, "interval", "1d")
 
   try:
-    buffer, error_message = generate_img(symbol, request.args, period)
+    buffer, error_message = generate_img(symbol, request.args, past=period, interval=interval)
 
     if not buffer:
       return error_message, 400
@@ -77,3 +84,10 @@ def check_period_validity(period):
   
   number, unit = checked
   return jsonify({ "number": number, "unit": unit })
+
+@api_blueprint.route('/check/interval/<string:interval>')
+def check_interval(interval):
+  if interval in VALID_INTERVAL:
+    return "ok", 200
+
+  return "Validity check failed", 400
