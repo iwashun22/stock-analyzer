@@ -46,11 +46,12 @@ function ShowGraph({ indicatorMap }: {
             interval,
             ...graphs[i].params
           }
-          await delay(600);
+          await delay(1000);
           const response = await axios.get(`/api/graph`, {
             params: obj,
             responseType: 'blob'
           });
+          if (response.status !== 200) throw new Error()
           const imageUrl = URL.createObjectURL(response.data);
 
           setImages(state => {

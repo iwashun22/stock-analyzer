@@ -71,7 +71,6 @@ def get_info(symbol):
     ticker = yf.Ticker(symbol)
     info = ticker.info
     if not info or ('longName' not in info) or (info.get('marketCap') is None):
-      print(info)
       return None
     else:
       return dict(ticker.info)

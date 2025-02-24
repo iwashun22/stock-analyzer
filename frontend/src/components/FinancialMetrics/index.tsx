@@ -1,20 +1,28 @@
 import { useEffect, useState } from 'react';
 import type { RootState } from '../../store';
-import { useSelector } from 'react-redux';
-import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
+import { updateValidity } from '@/features/targetSlice';
 import ValuationMetrics from './ValuationMetrics';
 import './index.scss';
+import { useNavigate } from 'react-router';
 
 function FinancialMetrics() {
   const symbol = useSelector((state: RootState) => state.target.symbol);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [info, setInfo] = useState<Record<string, any>>({});
   useEffect(() => {
-    axios.get(`/api/info/${symbol}`)
-      .then(response => {
-        setInfo(response.data);
+    fetch(`/api/info/${symbol}`)
+      .then(response =>  {
+        if (!response.ok) {
+          dispatch(updateValidity(false));
+          // navigate('/');
+          return;
+        }
+        return response.json()
       })
-      .catch(error => {
-        console.error(error);
+      .then(json => {
+        setInfo(json);
       })
   }, [])
   return (

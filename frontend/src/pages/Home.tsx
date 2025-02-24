@@ -16,8 +16,27 @@ const errMessage = {
   other: "Something went wrong."
 } as const;
 
+// change the value with delay
+// only triggers when user the stops typing for specific delay
+function useDebounce(value: unknown, delay: number) { 
+  const [debounceValue, setDebounceValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebounceValue(value)
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [value, delay])
+
+  return debounceValue;
+}
+
 function Home() {
   const [symbol, setSymbol] = useState<string>('');
+  const debouncedInput = useDebounce(symbol, 1500);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [edited, setEdited] = useState<boolean>(false);
@@ -55,34 +74,43 @@ function Home() {
     e.preventDefault();
     setEdited(true);
     const uppercase = e.target.value.toUpperCase();
-    // Abort any ongoing request before starting a new one
-    controller.abort();
-    controller = new AbortController();
     setSymbol(uppercase);
 
     if (!uppercase) {
       setError(errMessage.empty);
       setLoading(false);
-      return;
     }
-    setError('');
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/info/${uppercase}`, { signal: controller.signal });
-      if (!response.ok) {
-        setError(errMessage.invalidSymbol);
-      }
-      setLoading(false);
-    }
-    catch (error) {
-      if ((error as Error).name === "AbortError") return;
-      else {
-        setError(errMessage.other);
-        setLoading(false);
-      }
+    else {
+      setError('');
+      setLoading(true);
     }
   }, []);
+
+  useEffect(() => {
+    if (debouncedInput) {
+      const fetchSymbol = async () => {
+        // Abort any ongoing request before starting a new one
+        controller.abort();
+        controller = new AbortController();
+        try {
+          const response = await fetch(`/api/info/${debouncedInput}`, { signal: controller.signal });
+          if (!response.ok) {
+            setError(errMessage.invalidSymbol);
+          }
+          setLoading(false);
+        }
+        catch (error) {
+          if ((error as Error).name === "AbortError") return;
+          else {
+            setError(errMessage.other);
+            setLoading(false);
+          }
+        }
+      }
+
+      fetchSymbol();
+    }
+  }, [debouncedInput])
 
   return (
     <>

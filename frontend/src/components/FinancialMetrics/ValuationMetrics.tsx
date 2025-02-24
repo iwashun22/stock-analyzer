@@ -25,7 +25,7 @@ function ValuationMetrics({ info }: {
         <tr>
           {
             keys.current.map(({ keyName }, i) => 
-              <td key={i}>{ info[keyName] ? info[keyName] : "-" }</td>
+              <td key={i}>{ info?.[keyName] ? info[keyName] : "-" }</td>
             )
           }
         </tr>

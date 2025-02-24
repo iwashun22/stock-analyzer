@@ -15,4 +15,4 @@ ENV LANG=en_US.UTF-8
 # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 ENV TZ=Asia/Bangkok
 
-WORKDIR /app
+WORKDIR /main

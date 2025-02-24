@@ -1,14 +1,15 @@
 from flask import Flask
-from .routes import api_blueprint
+from app.routes import api_blueprint
+from app.cache import cache
 import argparse
 import os
+
+app = Flask(__name__)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--mode', type=str, default="dev", help="Select the mode (dev, test).")
 
 def create_app():
-  app = Flask(__name__)
-
   # configuration
   args = parser.parse_args()
   if args.mode == "test":
@@ -17,6 +18,9 @@ def create_app():
     app.config.from_object('config.TestingConfig')
   else:
     app.config.from_object('config.DevelopmentConfig')
+
+  # Initialize cache with the app
+  cache.init_app(app)
 
   app.register_blueprint(api_blueprint)
 

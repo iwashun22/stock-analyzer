@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import Description from './Description';
 
 const INDICATOR_WITH_RANGES = ['SMA', 'EMA', 'RSI', 'ADX', 'ATR', 'BBANDS'] as const;
@@ -18,8 +18,10 @@ function Docs({ indicator, fullname }: {
       <Description.Header title={formattedHeader.current}>
         <DocsWithRanges indicator={indicator} />
       </Description.Header>
-      <Description.SubHeader title="range">
-        <p>Hello World</p>
+      <Description.SubHeader title="fields" variant="gray">
+        <Description.BulletPoints name="range">
+          The number of periods used to calculate the output.
+        </Description.BulletPoints>
       </Description.SubHeader>
     </Description>
   )
@@ -31,6 +33,14 @@ function Docs({ indicator, fullname }: {
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quasi dolores exercitationem dignissimos. Dicta aut eum quos sit. Quo expedita nostrum corrupti tempora, labore, debitis aut mollitia neque explicabo, vero eos.
         </p>
       </Description.Header>
+      <Description.SubHeader title="fields" variant="gray">
+        <Description.BulletPoints name="fastperiod">
+          Hello World
+        </Description.BulletPoints>
+        <Description.BulletPoints name="slowperiod">
+          Hello World
+        </Description.BulletPoints>
+      </Description.SubHeader>
     </Description>
   )
 

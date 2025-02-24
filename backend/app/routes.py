@@ -1,8 +1,7 @@
 from flask import Blueprint, request, jsonify, send_file
-from .utils.helpers import get_info, get_property, VALID_INTERVAL
-from .utils.graph import *
-import re
-from collections import OrderedDict
+from app.utils.helpers import get_info, get_property, VALID_INTERVAL
+from app.utils.graph import *
+from app.cache import cache
 
 api_blueprint = Blueprint('api', __name__)
 
@@ -11,6 +10,7 @@ def index():
   return "Hello world!"
 
 @api_blueprint.route('/info/<symbol>')
+@cache.cached(query_string=True) # Cache based on query parameters
 def real_time_api(symbol):
   symbol = symbol.upper()
   data = get_info(symbol)

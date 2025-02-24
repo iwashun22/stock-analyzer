@@ -62,7 +62,7 @@ function TechnicalIndicators() {
       <Popup show={!!error} onClose={() => setError('')} variant='error'>
         <h5 className="text-center">{error}</h5>
       </Popup>
-      <div className="d-flex justify-content-center mt-3">
+      <div className="d-flex justify-content-center my-3">
         <button className="open-form-btn" onClick={() => setShowForm(true)}>
           <FaRegPlusSquare className="plus-icon"/>
         </button>

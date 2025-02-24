@@ -1,37 +1,49 @@
 import yfinance as yf
 import io, matplotlib.pyplot as plt
 import datetime as dt, numpy as np
+import pandas as pd
 from dateutil.relativedelta import relativedelta
-from .helpers import parse_time_period, get_property, resolve_path, VALID_INTERVAL
-from .handle_indicators import *
+from app.utils.helpers import parse_time_period, get_property, resolve_path, VALID_INTERVAL
+from app.utils.handle_indicators import *
+from app.cache import cache
 
 TREND_INDICATORS = ('SMA', 'EMA', 'ADX')
 MOMENTUM_INDICATORS = ('RSI', 'MACD')
 VOLATILITY_INDICATORS = ('BBANDS', 'ATR')
 
 def generate_img(symbol, request_args, past="1y", interval="1d"):
-  ticker = yf.Ticker(symbol)
-  now = dt.datetime.now()
-  period_format = parse_time_period(past)
-  if not period_format:
-    return None, "The time period format is invalid."
-  if not interval in VALID_INTERVAL:
-    return None, "The given interval is invalid."
+  cache_key = f"data_{symbol}_{past}_{interval}"
+  cached_data = cache.get(cache_key)
 
-  number, unit = period_format
-  if unit == "d":
-    timedelta = relativedelta(days=number)
-  elif unit == "w":
-    timedelta = relativedelta(weeks=number)
-  elif unit == "m":
-    timedelta = relativedelta(months=number)
-  elif unit == "y":
-    timedelta = relativedelta(years=number)
+  if cached_data:
+    data = pd.DataFrame.from_dict(cached_data)
+  else:
+    ticker = yf.Ticker(symbol)
+    now = dt.datetime.now()
+    period_format = parse_time_period(past)
+    if not period_format:
+      return None, "The time period format is invalid."
+    if not interval in VALID_INTERVAL:
+      return None, "The given interval is invalid."
 
-  data = ticker.history(start=now - timedelta, end=now, interval=interval)
+    number, unit = period_format
+    if unit == "d":
+      timedelta = relativedelta(days=number)
+    elif unit == "w":
+      timedelta = relativedelta(weeks=number)
+    elif unit == "m":
+      timedelta = relativedelta(months=number)
+    elif unit == "y":
+      timedelta = relativedelta(years=number)
+
+    data = ticker.history(start=now - timedelta, end=now, interval=interval)
 
   if data.empty:
+    cache.delete(cache_key)
     return None, "Data is empty."
+  else:
+    # save cache data for 30 minutes
+    cache.set(cache_key, data.to_dict(), timeout=1800)
 
   data["time_str"] = data.index.strftime("%Y-%m-%d %H:%M")
 
