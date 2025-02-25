@@ -72,8 +72,8 @@ def generate_graph():
       return error_message, 400
 
     return send_file(buffer, mimetype="image/png")
-  except:
-    return 'Something went wrong', 500
+  except Exception as err:
+    return f"Error: {err}", 500
 
 @api_blueprint.route('/check/period/<string:period>')
 def check_period_validity(period):

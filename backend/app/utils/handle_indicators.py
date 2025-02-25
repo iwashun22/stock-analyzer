@@ -60,14 +60,14 @@ def handle_rsi(data, draw, ax, in_range, first_call, last_call, req_arg):
   for i in range(1, len(data)):
     if sell_signal.iloc[i-1] and not sell_signal.iloc[i]:
       ax.scatter(
-        data.index[i], rsi[i],
+        data["time_str"].iloc[i], rsi[i],
         label='Sell Signal' if not sell_label_added else None,
         marker='v', color='red', alpha=1
       )
       sell_label_added = True
     elif buy_signal.iloc[i-1] and not buy_signal.iloc[i]:
       ax.scatter(
-        data.index[i], rsi[i],
+        data["time_str"].iloc[i], rsi[i],
         label='Buy Signal' if not buy_label_added else None,
         marker='^', color='green', alpha=1
       )
@@ -89,29 +89,30 @@ def handle_adx(data, draw, ax, in_range, first_call, last_call, req_arg):
     draw(positive_di, label=f"+ DI", color='green', dashes=[2, 2, 5, 2])
     draw(negative_di, label=f"- DI", color='red', dashes=[2, 2, 5, 2])
 
-    buy_signal = (positive_di > negative_di) & (adx > 20)
-    sell_signal = (negative_di > positive_di) & (adx > 20)
-    buy_label_added, sell_label_added = False, False
-    recently_labeled = None
-    for i in range(len(data)):
-      if buy_signal.iloc[i]:
-        if recently_labeled == "buy":
-          continue
-        ax.scatter(
-          data.index[i], positive_di.iloc[i], marker='^', color='darkgreen',
-          label='Buy Signal' if not buy_label_added else None
-        )
-        buy_label_added = True
-        recently_labeled = "buy"
-      elif sell_signal.iloc[i]:
-        if recently_labeled == "sell":
-          continue
-        ax.scatter(
-          data.index[i], negative_di.iloc[i], marker='v', color='darkred',
-          label='Sell Signal' if not sell_label_added else None
-        )
-        sell_label_added = True
-        recently_labeled = "sell"
+    if "show-signal" in req_arg:
+      buy_signal = (positive_di > negative_di) & (adx > 20)
+      sell_signal = (negative_di > positive_di) & (adx > 20)
+      buy_label_added, sell_label_added = False, False
+      recently_labeled = None
+      for i in range(len(data)):
+        if buy_signal.iloc[i]:
+          if recently_labeled == "buy":
+            continue
+          ax.scatter(
+            data["time_str"].iloc[i], positive_di.iloc[i], marker='^', color='darkgreen',
+            label='Buy Signal' if not buy_label_added else None
+          )
+          buy_label_added = True
+          recently_labeled = "buy"
+        elif sell_signal.iloc[i]:
+          if recently_labeled == "sell":
+            continue
+          ax.scatter(
+            data["time_str"].iloc[i], negative_di.iloc[i], marker='v', color='darkred',
+            label='Sell Signal' if not sell_label_added else None
+          )
+          sell_label_added = True
+          recently_labeled = "sell"
 
 
 @_time_period_indicator(1)

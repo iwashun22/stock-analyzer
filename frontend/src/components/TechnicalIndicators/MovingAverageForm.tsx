@@ -7,15 +7,27 @@ import { addGraph, modifyGraph } from '@/features/graphSlice';
 import FormActionButtons from '../FormActionButtons';
 import './MovingAverageForm.scss';
 
-function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParams, id, afterSubmit, closeForm }: {
+export interface FormProps {
   indicatorName: string,
   abbrev: string,
   maxRangesCount: number,
   defaultParams?: { [key: string]: any },
+  customParams?: { [key: string]: any },
   id: string,
   afterSubmit: () => unknown,
   closeForm: undefined | (() => unknown),
-}) {
+}
+function MovingAverageForm({ 
+  indicatorName,
+  abbrev,
+  maxRangesCount,
+  defaultParams,
+  customParams = {},
+  id,
+  afterSubmit,
+  closeForm,
+  children
+}: React.PropsWithChildren<FormProps>) {
   const [countRanges, setCountRanges] = useState<Array<string>>(defaultParams?.ranges?.split(';') || ['12']);
   const [invalidIndex, setInvalidIndex] = useState(-1);
   const [invalidFeedback, setInvalidFeedback] = useState('');
@@ -75,17 +87,17 @@ function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParam
       dispatch(modifyGraph({
         id: id,
         indicator: abbrev,
-        params: { ranges: countRanges.join(';') }
+        params: { ranges: countRanges.join(';'), ...customParams }
       }));
     } else {
       dispatch(addGraph({ 
         indicator: abbrev,
-        params: { ranges: countRanges.join(';') }
+        params: { ranges: countRanges.join(';'), ...customParams }
       }));
     }
 
     afterSubmit();
-  }, [countRanges]);
+  }, [countRanges, customParams]);
 
   return (
     <>
@@ -108,6 +120,8 @@ function MovingAverageForm({ indicatorName, abbrev, maxRangesCount, defaultParam
               </InputGroup>
           ))
         }
+
+        { children }
 
         <div className="d-flex justify-content-end">
         {
