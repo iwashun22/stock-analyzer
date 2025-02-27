@@ -90,8 +90,8 @@ def handle_adx(data, draw, ax, in_range, first_call, last_call, req_arg):
     draw(negative_di, label=f"- DI", color='red', dashes=[2, 2, 5, 2])
 
     if "show-signal" in req_arg:
-      buy_signal = (positive_di > negative_di) & (adx > 20)
-      sell_signal = (negative_di > positive_di) & (adx > 20)
+      buy_signal = (positive_di > negative_di) & (adx > 25)
+      sell_signal = (negative_di > positive_di) & (adx > 25)
       buy_label_added, sell_label_added = False, False
       recently_labeled = None
       for i in range(len(data)):
@@ -99,7 +99,7 @@ def handle_adx(data, draw, ax, in_range, first_call, last_call, req_arg):
           if recently_labeled == "buy":
             continue
           ax.scatter(
-            data["time_str"].iloc[i], positive_di.iloc[i], marker='^', color='darkgreen',
+            data["time_str"].iloc[i], adx.iloc[i], marker='^', color='darkgreen',
             label='Buy Signal' if not buy_label_added else None
           )
           buy_label_added = True
@@ -108,7 +108,7 @@ def handle_adx(data, draw, ax, in_range, first_call, last_call, req_arg):
           if recently_labeled == "sell":
             continue
           ax.scatter(
-            data["time_str"].iloc[i], negative_di.iloc[i], marker='v', color='darkred',
+            data["time_str"].iloc[i], adx.iloc[i], marker='v', color='darkred',
             label='Sell Signal' if not sell_label_added else None
           )
           sell_label_added = True

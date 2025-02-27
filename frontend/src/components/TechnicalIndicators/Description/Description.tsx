@@ -78,5 +78,10 @@ export const Emphasis: React.FC<React.PropsWithChildren<EmphasisProp>> = ({ chil
     <i className={classList.join(" ")}>{ children }</i>
   )
 }
+export const SmallHeader: React.FC<React.PropsWithChildren> = ({ children }) => {
+  return (
+    <h6 className="fs-6 fw-semibold text-secondary-emphasis mt-4">{ children }</h6>
+  )
+}
 
 export default Description;
