@@ -16,7 +16,7 @@ function ADXForm({
   afterSubmit,
   closeForm,
 }: Props) {
-  const [showDI, setShowDI] = useState(defaultParams?.["show-di"] as boolean || true);
+  const [showDI, setShowDI] = useState<boolean>(defaultParams?.["show-di"] as boolean || true);
   const [showSignal, setShowSignal] = useState(defaultParams?.["show-signal"] as boolean || false);
   const [params, setParams] = useState({});
 

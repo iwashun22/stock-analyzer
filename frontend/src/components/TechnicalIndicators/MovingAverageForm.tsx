@@ -28,7 +28,22 @@ function MovingAverageForm({
   closeForm,
   children
 }: React.PropsWithChildren<FormProps>) {
-  const [countRanges, setCountRanges] = useState<Array<string>>(defaultParams?.ranges?.split(';') || ['12']);
+  let DEFAULT_RANGES = [''];
+  switch(abbrev) {
+    case 'SMA':
+    case 'BBANDS':
+      DEFAULT_RANGES = ['20'];
+      break;
+    case 'EMA':
+      DEFAULT_RANGES = ['12'];
+      break;
+    case 'ADX':
+    case 'ATR':
+      DEFAULT_RANGES = ['14'];
+      break;
+  }
+
+  const [countRanges, setCountRanges] = useState<Array<string>>(defaultParams?.ranges?.split(';') || DEFAULT_RANGES);
   const [invalidIndex, setInvalidIndex] = useState(-1);
   const [invalidFeedback, setInvalidFeedback] = useState('');
   const dispatch = useDispatch();

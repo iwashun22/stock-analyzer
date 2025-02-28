@@ -119,10 +119,10 @@ def handle_adx(data, draw, ax, in_range, first_call, last_call, req_arg):
 def handle_bbands(data, draw, ax, in_range, first_call, last_call, req_arg):
   upper_band, middle_band, lower_band = talib.BBANDS(data['Close'], timeperiod=in_range)
 
-  draw(middle_band, label=f"SMA - {in_range}", color='navy', dashes=[3, 1])
+  draw(middle_band, include_nan=True, label=f"SMA - {in_range}", color='navy', dashes=[3, 1])
   draw(upper_band, label='Upper Band', color='red', dashes=[3, 1])
   draw(lower_band, label='Lower Band', color='green', dashes=[3, 1])
-  ax.fill_between(data.index, upper_band, lower_band, color='gray', alpha=.3)
+  ax.fill_between(data["time_str"], upper_band, lower_band, color='wheat', alpha=.3)
 
 
 @_time_period_indicator(1)
@@ -145,18 +145,19 @@ def handle_macd(request_args, data, draw, ax):
   draw(signal, label='Signal')
   draw(hist, label='Histogram', pltype='bar', color='purple')
 
-  buy_label_added, sell_label_added = False, False
-  for i in range(1, len(macd)):
-    # When MACD line crosses over the Signal line
-    if macd.iloc[i-1] < signal.iloc[i-1] and macd.iloc[i] > signal.iloc[i]:
-      buy_label = 'Buy Signal' if not buy_label_added else None
-      ax.axvline(data["time_str"].iloc[i], color='green', linestyle='dotted', alpha=0.5, label=buy_label)
-      buy_label_added = True
-    # When MACD line crosses down the Signal line
-    elif macd.iloc[i-1] > signal.iloc[i-1] and macd.iloc[i] < signal.iloc[i]:
-      sell_label = 'Sell Signal' if not sell_label_added else None
-      ax.axvline(data["time_str"].iloc[i], color='red', linestyle='dotted', alpha=0.5, label=sell_label)
-      sell_label_added = True
+  if "show-signal" in request_args:
+    buy_label_added, sell_label_added = False, False
+    for i in range(1, len(macd)):
+      # When MACD line crosses over the Signal line
+      if macd.iloc[i-1] < signal.iloc[i-1] and macd.iloc[i] > signal.iloc[i]:
+        buy_label = 'Buy Signal' if not buy_label_added else None
+        ax.axvline(data["time_str"].iloc[i], color='green', linestyle='dotted', alpha=0.5, label=buy_label)
+        buy_label_added = True
+      # When MACD line crosses down the Signal line
+      elif macd.iloc[i-1] > signal.iloc[i-1] and macd.iloc[i] < signal.iloc[i]:
+        sell_label = 'Sell Signal' if not sell_label_added else None
+        ax.axvline(data["time_str"].iloc[i], color='red', linestyle='dotted', alpha=0.5, label=sell_label)
+        sell_label_added = True
 
   return True, None
 

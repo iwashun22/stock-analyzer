@@ -7,7 +7,7 @@ const isIncludingRanages = (str: string): str is (typeof INDICATOR_WITH_RANGES[n
   return INDICATOR_WITH_RANGES.some(v => v === str);
 }
 
-const subheaderTitle = "purpose";
+const subheaderTitle = "detail";
 const inputFieldTitle = "fields";
 
 function Docs({ indicator, fullname }: {
@@ -22,7 +22,7 @@ function Docs({ indicator, fullname }: {
         <DocsWithRanges indicator={indicator} section="headerTitle"/>
       </Description.Header>
       <Description.SubHeader title={subheaderTitle}>
-        <DocsWithRanges indicator={indicator} section="purpose"/>
+        <DocsWithRanges indicator={indicator} section="detail"/>
       </Description.SubHeader>
       <Description.SubHeader title={inputFieldTitle} variant="gray">
         <Description.BulletPoints name="range">
@@ -55,12 +55,12 @@ function Docs({ indicator, fullname }: {
     </Description>
   )
 
-  return <></>
+  return null;
 }
 
 function DocsWithRanges({ indicator, section }: {
   indicator: typeof INDICATOR_WITH_RANGES[number],
-  section: "headerTitle" | "purpose" | "customParam"
+  section: "headerTitle" | "detail" | "customParam"
 }) {
 
   if (section === "customParam") {
@@ -170,10 +170,43 @@ function DocsWithRanges({ indicator, section }: {
         </>
       )
     case 'BBANDS':
-      return (
+      return section === "headerTitle" ? (
         <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure fugit libero dolorem incidunt beatae amet? Facere reprehenderit delectus, sit eaque amet expedita? Consequatur reiciendis aliquid nulla. Quo eos unde iste?
+          A technical indicator that analyzes market volatility, visualized with bands on the graph.
         </p>
+      ) : (
+        <>
+          <p>
+            Wider bands indicate higher volatility, while narrower bands indicate lower volatility.
+          </p>
+          <p>
+            <Emph>Bollinger Bands (BBANDS)</Emph> are consisted of three lines:
+          </p>
+          <ul>
+            <li>
+              <Emph>Middle Band</Emph>
+              <p className="ps-3 formula-text">= SMA(n)</p>
+            </li>
+            <li>
+              <Emph>Upper Band</Emph>
+              <p className="ps-3 formula-text">= SMA(n) + (K &times; &sigma;)</p>
+            </li>
+            <li>
+              <Emph>Lower Band</Emph>
+              <p className="ps-3 formula-text">= SMA(n) &minus; (K &times; &sigma;)</p>
+            </li>
+          </ul>
+          <p><Emph>Where:</Emph></p>
+          <p className="ps-3">
+            <Emph>SMA</Emph> is the Simple Moving Average (20 periods by default).
+          </p>
+          <p className="ps-3">
+            <Emph>&sigma;</Emph> is the standard deviation of the price.
+          </p>
+          <p className="ps-3">
+            <Emph>K</Emph> is a multiplier (typically 2).
+          </p>
+        </>
       )
     case 'RSI':
       return (

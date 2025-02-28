@@ -16,6 +16,7 @@ function MACDForm({ indicatorName, defaultParams, id, afterSubmit, closeForm }: 
   const [fastperiod, setFastperiod] = useState(defaultParams["fastperiod"] || '12');
   const [slowperiod, setSlowperiod] = useState(defaultParams["slowperiod"] || '26');
   const [signalperiod, SetSignalperiod] = useState(defaultParams["signalperiod"] || '9');
+  const [showSignal, setShowSignal] = useState((defaultParams["show-signal"] as boolean) || false);
   const [invalidParam, setInvalidParam] = useState<{ index: number, message: string }>({ index: -1, message: '' });
   const dispatch = useDispatch();
 
@@ -56,6 +57,7 @@ function MACDForm({ indicatorName, defaultParams, id, afterSubmit, closeForm }: 
       return;
     }
 
+    const showSignalParam = showSignal ? { "show-signal": true } : {};
     if (id) {
       dispatch(modifyGraph({
         id,
@@ -63,7 +65,8 @@ function MACDForm({ indicatorName, defaultParams, id, afterSubmit, closeForm }: 
         params: {
           fastperiod: fast.period,
           slowperiod: slow.period,
-          signalperiod: signal.period
+          signalperiod: signal.period,
+          ...showSignalParam
         }
       }));
     }
@@ -73,13 +76,14 @@ function MACDForm({ indicatorName, defaultParams, id, afterSubmit, closeForm }: 
         params: {
           fastperiod: fast.period,
           slowperiod: slow.period,
-          signalperiod: signal.period
+          signalperiod: signal.period,
+          ...showSignalParam
         }
       }));
     }
 
     afterSubmit();
-  }, [fastperiod, slowperiod, signalperiod]);
+  }, [fastperiod, slowperiod, signalperiod, showSignal]);
 
   return (
     <>
@@ -106,6 +110,15 @@ function MACDForm({ indicatorName, defaultParams, id, afterSubmit, closeForm }: 
           </InputGroup>
         ))
       }
+        <InputGroup className="params-wrapper mb-4">
+          <InputGroup.Text>Show Signal</InputGroup.Text>
+          <InputGroup.Checkbox 
+            checked={showSignal}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setShowSignal(e.target.checked);
+            }}
+          />
+        </InputGroup>
       <FormActionButtons closeForm={closeForm} />
     </Form>
     </>

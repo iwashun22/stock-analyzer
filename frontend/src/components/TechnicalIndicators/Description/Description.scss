@@ -81,6 +81,10 @@ $container-border-radius: 10px;
   }
 }
 
+.formula-text {
+  font-family: "Noto Sans Math", "Cambria Math", "Times New Roman", serif;
+}
+
 @media screen and (max-width: 600px) {
   .bullet-list {
     flex-direction: column;

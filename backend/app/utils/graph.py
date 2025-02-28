@@ -89,7 +89,6 @@ def generate_img(symbol, request_args, past="1y", interval="1d"):
     if indicator == 'BBANDS':
       fig, ax, draw = _draw_graph(
         data,
-        close_prices=data['Close'],
         suptitle=indicator
       )
       success, error_message = handle_bbands(request_args, data, draw, ax)

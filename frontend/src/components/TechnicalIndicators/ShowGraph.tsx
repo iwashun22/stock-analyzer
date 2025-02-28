@@ -4,7 +4,8 @@ import { deleteGraph } from '@/features/graphSlice';
 import type { RootState } from '@/store';
 import Spinner from 'react-bootstrap/Spinner';
 import axios from 'axios';
-import { FaTrashAlt, FaEdit, FaRegQuestionCircle } from 'react-icons/fa';
+import { FaTrashAlt, FaEdit, FaInfoCircle } from 'react-icons/fa';
+import { FaArrowRotateRight } from 'react-icons/fa6';
 import Popup from '../Popup';
 import IndicatorForm from './IndicatorForm';
 import Docs from './Description';
@@ -111,7 +112,6 @@ function ShowGraph({ indicatorMap }: {
           <Graph
             indicator={v.indicator}
             fullname={indicatorMap.get(v.indicator) as string}
-            params={v.params}
             id={v.id} key={i}
             imageUrl={images[i]?.url}
             deleteFromList={() => setImages(state => state.filter(x => x.id !== v.id))}
@@ -123,10 +123,9 @@ function ShowGraph({ indicatorMap }: {
 }
 
 
-function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
+function Graph({ indicator, fullname, id, imageUrl, deleteFromList }: {
   indicator: string,
   fullname: string,
-  params: { [key: string]: any },
   id: string,
   imageUrl: string | undefined,
   deleteFromList: () => unknown,
@@ -139,6 +138,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
   const [showDescription, setShowDescription] = useState(false);
   const { symbol, period, interval } = useSelector((state: RootState) => state.target);
   const graphs = useSelector((state: RootState) => state.graph.list);
+  const [params, setParams] = useState({});
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -160,6 +160,11 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
   }, [imageUrl]);
 
   useEffect(() => {
+    const newParams = graphs.filter(v => v.id === id)[0].params;
+    setParams(newParams);
+  }, [graphs])
+
+  useEffect(() => {
     if (!requireReload) return;
 
     setLoaded(false);
@@ -176,13 +181,25 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
           },
           responseType: 'blob',
         });
+
+        if (response.status !== 200) {
+          throw new Error(response.statusText);
+        }
+
         const newUrl = URL.createObjectURL(response.data);
         if (typeof dataUrl === 'string') URL.revokeObjectURL(dataUrl);
         setDataUrl(newUrl);
+        setError(false);
       }
       catch (err) {
         setError(true);
-        console.error(err);
+        if (axios.isAxiosError(err)) {
+          const errorText = await (err.response?.data as Blob).text();
+          console.log(errorText);
+        }
+        else {
+          console.log('Unexpected Error:', err);
+        }
       }
       finally {
         setLoaded(true);
@@ -191,7 +208,7 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
     }
 
     fetchNewImage();
-  }, [requireReload, graphs])
+  }, [params]);
 
   useEffect(() => {
     if (imageUrl === '') {
@@ -227,11 +244,24 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
       <Popup show={showDescription} onClose={() => setShowDescription(false)}>
         <Docs indicator={indicator} fullname={fullname}/>
       </Popup>
+      <Popup show={showEditForm} onClose={() => setShowEditForm(false)}>
+        <IndicatorForm 
+          indicator={[indicator, fullname]}
+          defaultParams={{ ...params }}
+          modifyId={id}
+          afterSubmit={() => { setShowEditForm(false); setRequireReload(true); }}
+          closeForm={() => setShowEditForm(false)}
+        />
+      </Popup>
       <Template 
         indicator={indicator}
         deleteButtonOnClick={handleDelete}
         helpButtonOnClick={() => setShowDescription(true)}
-        hideEdit
+        reloadButtonOnClick={() => {
+          setRequireReload(true);
+          setParams({ ...params });
+        }}
+        editButtonOnClick={() => setShowEditForm(true)}
       />
     </>
   )
@@ -256,6 +286,10 @@ function Graph({ indicator, fullname, params, id, imageUrl, deleteFromList }: {
         editButtonOnClick={() => setShowEditForm(true)}
         helpButtonOnClick={() => setShowDescription(true)}
         deleteButtonOnClick={handleDelete}
+        reloadButtonOnClick={() => {
+          setRequireReload(true);
+          setParams({ ...params })
+        }}
       />
     </>
   )
@@ -268,6 +302,7 @@ type TemplateProps = {
   helpButtonOnClick?: (e: React.MouseEvent) => unknown,
   editButtonOnClick?: (e: React.MouseEvent) => unknown,
   deleteButtonOnClick?: (e: React.MouseEvent) => unknown,
+  reloadButtonOnClick?: ((e: React.MouseEvent) => unknown) | undefined,
 };
 function Template({ 
   indicator,
@@ -276,15 +311,22 @@ function Template({
   helpButtonOnClick = () => {},
   editButtonOnClick = () => {},
   deleteButtonOnClick = () => {},
+  reloadButtonOnClick = undefined
 }: TemplateProps) {
   return (
     <div className="text-center mb-4">
       <div className="config-container">
         <button className="info-btn" onClick={helpButtonOnClick}>
-          <FaRegQuestionCircle className="icon"/>
+          <FaInfoCircle className="icon"/>
         </button>
         <h5 className="text-light indicator-name mx-4">{indicator}</h5>
         <div>
+          {
+            !!reloadButtonOnClick &&
+            <button className="reload-btn" onClick={reloadButtonOnClick}>
+              <FaArrowRotateRight className="icon"/>
+            </button>
+          }
           {
             !hideEdit &&
             <button className="edit-btn" onClick={editButtonOnClick}>
@@ -308,4 +350,4 @@ function Template({
   )
 }
 
-export default ShowGraph
+export default ShowGraph;
