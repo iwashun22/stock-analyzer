@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useState } from 'react';
+import { useDebounce } from '@/util/helper';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/store';
 import { updateValidity, updateSymbol } from '@/features/targetSlice';
@@ -16,27 +17,9 @@ const errMessage = {
   other: "Something went wrong."
 } as const;
 
-// change the value with delay
-// only triggers when user the stops typing for specific delay
-function useDebounce(value: unknown, delay: number) { 
-  const [debounceValue, setDebounceValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebounceValue(value)
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    }
-  }, [value, delay])
-
-  return debounceValue;
-}
-
 function Home() {
   const [symbol, setSymbol] = useState<string>('');
-  const debouncedInput = useDebounce(symbol, 1500);
+  const debouncedInput = useDebounce(symbol, 1000);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [edited, setEdited] = useState<boolean>(false);
@@ -152,7 +135,6 @@ function Home() {
             <Form.Group as={Col} className="input-submit">
               <Button 
                 type="submit"
-                // variant="outline-light"
                 className="px-4 submit-btn"
               >
                 LOOK UP

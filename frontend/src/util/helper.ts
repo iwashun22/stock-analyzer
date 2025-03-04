@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 
 export const UNITS = {
   d: 'days',
@@ -14,3 +15,21 @@ export function checkUnit(input: string): input is SupportedUnit {
 }
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// change the value with delay
+// only triggers when user the stops typing for specific delay
+export function useDebounce(value: unknown, delay: number) { 
+  const [debounceValue, setDebounceValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebounceValue(value)
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    }
+  }, [value, delay])
+
+  return debounceValue;
+}

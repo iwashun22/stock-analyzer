@@ -111,8 +111,8 @@ def generate_img(symbol, request_args, past="1y", interval="1d"):
   ax.legend(
     loc='upper left',
     prop={'family': 'monospace', 'size': 10},
-    bbox_to_anchor=(1.05, 1),
-    borderaxespad=0.
+    # bbox_to_anchor=(1.05, 1),
+    # borderaxespad=0.
   )
 
   # Set a fixed number of labels

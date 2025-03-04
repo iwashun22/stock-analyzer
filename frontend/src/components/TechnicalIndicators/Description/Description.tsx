@@ -66,8 +66,9 @@ interface EmphasisProp {
   underline?: boolean,
   lineThrough?: boolean,
   italic?: boolean,
+  className?: string,
 }
-export const Emphasis: React.FC<React.PropsWithChildren<EmphasisProp>> = ({ children, underline = false, lineThrough = false, italic = false }) => {
+export const Emphasis: React.FC<React.PropsWithChildren<EmphasisProp>> = ({ children, underline = false, lineThrough = false, italic = false, className = '' }) => {
   const classList = [
     "text-secondary-emphasis",
     underline && "text-decoration-underline",
@@ -75,7 +76,9 @@ export const Emphasis: React.FC<React.PropsWithChildren<EmphasisProp>> = ({ chil
     italic && "fst-italic",
   ].filter(v => v);
   return (
-    <i className={classList.join(" ")}>{ children }</i>
+    <span className={className}>
+      <i className={classList.join(" ")}>{ children }</i>
+    </span>
   )
 }
 export const SmallHeader: React.FC<React.PropsWithChildren> = ({ children }) => {

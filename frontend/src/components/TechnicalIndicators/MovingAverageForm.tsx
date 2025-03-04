@@ -39,6 +39,7 @@ function MovingAverageForm({
       break;
     case 'ADX':
     case 'ATR':
+    case 'RSI':
       DEFAULT_RANGES = ['14'];
       break;
   }

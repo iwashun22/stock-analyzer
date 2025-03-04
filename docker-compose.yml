@@ -12,6 +12,7 @@ services:
       - VITE_API_URL=http://backend:8001
     volumes:
       - ./frontend:/app
+    command: sh -c "chmod +x start.sh && ./start.sh"
     depends_on:
       - backend
   backend:
@@ -32,4 +33,4 @@ services:
       - ./backend/ta-lib/lib/libta_lib.so.0:/usr/lib/libta_lib.so.0
       - ./backend/ta-lib/lib/libta_lib.so.0.0.0:/usr/lib/libta_lib.so.0.0.0
       - ./backend/ta-lib/include:/usr/include/ta-lib
-    # command: sh -c "pip3 install -r requirements.txt"
+    command: sh -c "chmod +x start.sh && ./start.sh"
