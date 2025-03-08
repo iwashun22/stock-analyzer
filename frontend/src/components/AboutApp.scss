@@ -1,0 +1,58 @@
+#about-app {
+  padding: 100px max(15px, 8%) 50px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background-color: #F4EEE1;
+
+  .about-header {
+    font-size: 2.3rem;
+  }
+
+  .split-container {
+    display: flex;
+    flex-direction: column;
+
+    .left-container, .right-container {
+      flex: 1;
+    }
+
+    .right-container {
+      padding-top: 2rem;
+    }
+  }
+}
+
+.styled-header {
+  padding-bottom: 15px;
+  position: relative;
+  margin-bottom: 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    height: 4px;
+    width: 70px;
+    left: 0;
+    bottom: 0;
+    background-color: rgb(255, 49, 104);
+  }
+}
+
+@media screen and (min-width: 750px) {
+  #about-app {
+    .split-container {
+      flex-direction: row;
+
+      .left-container {
+        margin-right: 4rem;
+      }
+      .right-container {
+        padding-top: 6rem;
+      }
+    }
+  }
+
+  .styled-header {
+    margin-bottom: 30px;
+  }
+}

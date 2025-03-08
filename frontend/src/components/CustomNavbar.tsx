@@ -10,7 +10,7 @@ function CustomNavbar() {
       <Container>
         <Nav className="w-100 flex-row justify-content-end">
           <Nav.Item className="nav-item">
-            <Nav.Link href="#" className="fs-5 text-uppercase text-light fw-semibold">About</Nav.Link>
+            <Nav.Link href="#about-app" className="fs-5 text-uppercase text-light fw-semibold">About</Nav.Link>
           </Nav.Item>
           <Nav.Item className="nav-item">
             <Nav.Link 

@@ -41,6 +41,7 @@ body, html {
   height: 100vh;
   height: 100dvh;
   overflow: scroll;
+  scroll-behavior: smooth;
 }
 
 h1 {

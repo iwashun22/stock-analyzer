@@ -5,6 +5,8 @@ import type { RootState } from '@/store';
 import { updateValidity, updateSymbol } from '@/features/targetSlice';
 import { useNavigate } from 'react-router';
 import CustomNavbar from '@/components/CustomNavbar';
+import AboutApp from '@/components/AboutApp';
+import Footer from '@/components/Footer';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -144,6 +146,8 @@ function Home() {
         </Form>
       </div>
     </div>
+    <AboutApp/>
+    <Footer />
     </>
   )
 }
