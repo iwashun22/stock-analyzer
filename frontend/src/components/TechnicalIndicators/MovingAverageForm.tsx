@@ -64,7 +64,7 @@ function MovingAverageForm({
         return;
       }
 
-      if (!lastChar.match(/[0-9]/) || value.length > 2) return;
+      if (!lastChar.match(/[0-9]/) || value.length > 3) return;
 
       setCountRanges(state => state.map((v, i) => i === index ? (+value).toString() : v));
     }
