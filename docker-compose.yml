@@ -8,6 +8,7 @@ services:
     stdin_open: true # docker run -i
     ports:
       - "8000:8000"
+    env_file: config.env
     environment:
       - VITE_API_URL=http://backend:8001
     volumes:
@@ -23,14 +24,11 @@ services:
     stdin_open: true
     ports:
       - "8001:8001"
+    env_file: config.env
     environment:
       - FLASK_APP=run.py
       - FLASK_RUN_PORT=8001
       - PYTHONPATH=/main
     volumes:
       - ./backend:/main
-      - ./backend/ta-lib/lib/libta_lib.so:/usr/lib/libta_lib.so
-      - ./backend/ta-lib/lib/libta_lib.so.0:/usr/lib/libta_lib.so.0
-      - ./backend/ta-lib/lib/libta_lib.so.0.0.0:/usr/lib/libta_lib.so.0.0.0
-      - ./backend/ta-lib/include:/usr/include/ta-lib
     command: sh -c "chmod +x start.sh && ./start.sh"

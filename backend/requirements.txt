@@ -3,7 +3,7 @@ matplotlib==3.10.0
 numpy==2.2.0
 pandas==2.2.3
 setuptools==75.6.0
-ta-lib==0.5.1
+ta-lib==0.6.3
 wheel==0.45.1
 yfinance==0.2.54
 flask==3.1.0

@@ -1,5 +1,9 @@
 #! /bin/bash
 
+if [ "$AUTO_START" != 1 ]; then
+  exec bash
+fi
+
 if [[ ! -d "venv" ]]; then
   python3 -m venv venv
 fi

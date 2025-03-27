@@ -16,3 +16,6 @@ ENV LANG=en_US.UTF-8
 ENV TZ=Asia/Bangkok
 
 WORKDIR /main
+
+COPY ./ta-lib/lib/* /usr/lib/
+COPY ./ta-lib/include /usr/include/ta-lib

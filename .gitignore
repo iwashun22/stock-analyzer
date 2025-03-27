@@ -3,6 +3,7 @@ venv
 
 node_modules
 *.logs
+ta-lib-0.6.4
 
 preview_img
 

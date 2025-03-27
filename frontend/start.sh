@@ -1,5 +1,9 @@
 #! /bin/bash
 
+if [ "$AUTO_START" != 1 ]; then
+  exec bash
+fi
+
 yarn dev
 
 if [[ $? -ne 0 ]]; then
