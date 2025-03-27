@@ -63,14 +63,14 @@ Start the frontend server:
 yarn dev
 ```
 
-## **Fixing the Error**
+## **Fixing the Error (If you are using Docker)**
 
 If you encounter an error, check whether Docker has installed the required libraries. The issue most likely occurs inside the **backend** service.  
 
 ### **Step 1: Modify the Configuration**  
 1. Open the `config.env` file.  
 2. Change the value of `AUTO_START` to any number **other than** `1`.  
-3. Run the following command to restart the Docker container:  
+3. Run the following command to start the Docker container:  
 
 ```bash
 docker-compose up -d
