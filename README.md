@@ -18,6 +18,7 @@ If you have **Docker** installed, you can start the application by running:
 docker-compose up
 ```
 This will automatically set up the necessary environment.
+It may take some time if you are running this command for the first time.
 If there's an unexpected error, try following [these steps](#fixing-the-error).
 
 ### Manual Installation
