@@ -3,6 +3,7 @@
 ## Introduction
 Hello, I’m Shun. This is my **CS50x final project**.
 The **Stock Analyzer** is a web application designed to help users analyze stock data with financial metrics and customizable technical indicator graphs.
+I use [TA-Lib](https://ta-lib.org) and have included its core library in this repository.
 
 ## Features
 - Search for stock symbols (only stocks, **not** forex or cryptocurrency).
